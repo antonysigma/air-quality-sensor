@@ -1,0 +1,5 @@
+build-uno/
+subprojects/*/
+
+# Python virtual environment
+.venv/
