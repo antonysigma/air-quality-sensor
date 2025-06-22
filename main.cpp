@@ -5,6 +5,7 @@
 #include "callbacks.hpp"
 #include "components/blink.hpp"
 #include "components/core.hpp"
+#include "components/serial.hpp"
 
 namespace {
 struct registered_interfaces {
@@ -21,7 +22,9 @@ struct project {
     static constexpr auto config = cib::components<  //
         registered_interfaces,                       //
         core::impl,                                  //
-        Blink<13>>;
+        SerialPort,                                  //
+        Blink<13>                                    //
+        >;
 };
 
 cib::nexus<project> nexus{};

@@ -6,6 +6,13 @@
 #include "config.h"
 
 namespace components {
+
+static volatile uint32_t millis_value = 0;
+uint32_t
+Millis() {
+    return millis_value;
+}
+
 namespace core {
 
 template <uint16_t factor>
@@ -78,7 +85,9 @@ struct impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
             disable_interrupt >> system_clk_init >> timer0_init >> enable_interrupt  //
-            ));
+            ),
+        cib::extend<OnTimer0Interrupt>([]() { millis_value = millis_value + 1; })  //
+    );
 };
 
 }  // namespace core
