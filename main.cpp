@@ -5,6 +5,8 @@
 #include "callbacks.hpp"
 #include "components/blink.hpp"
 #include "components/core.hpp"
+#include "components/gas_sensor.hpp"
+#include "components/i2c_port.hpp"
 #include "components/serial.hpp"
 
 namespace {
@@ -18,12 +20,16 @@ struct registered_interfaces {
 
 using namespace components;
 
+using Heartbeat = Blink<13>;
+
 struct project {
     static constexpr auto config = cib::components<  //
         registered_interfaces,                       //
         core::impl,                                  //
         SerialPort,                                  //
-        Blink<13>                                    //
+        Heartbeat,                                   //
+        I2CPort,
+        GasSensor<Heartbeat>  //
         >;
 };
 
@@ -38,7 +44,8 @@ main() {
     nexus.service<RuntimeInit>();
 
     for (;;) {
-        nexus.service<MainLoop>();
+        const auto current_ms = components::Millis();
+        nexus.service<MainLoop>(current_ms);
     }
 
     return 0;

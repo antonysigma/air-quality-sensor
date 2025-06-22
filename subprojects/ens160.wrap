@@ -1,0 +1,10 @@
+[wrap-git]
+directory = ENS160_driver
+url = https://github.com/adafruit/ENS160_driver.git
+revision = 2b42be14c984847f225841568015fd5129d7ff82
+depth = 1
+
+patch_directory=ens160
+
+[provide]
+ens160=ens160_dep

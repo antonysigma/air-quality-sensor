@@ -3,3 +3,6 @@ subprojects/*/
 
 # Python virtual environment
 .venv/
+
+# IDE
+.vscode/

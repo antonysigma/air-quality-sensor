@@ -15,6 +15,8 @@ cib_dep = cib_proj.get_variable('cib_dep')
 arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')
 
+ens160_dep = subproject('ens160').get_variable('ens160_dep')
+
 main_exe = executable('main',
     sources: [
         'main.cpp',
@@ -31,6 +33,7 @@ main_exe = executable('main',
         # avr-ar does not support fat object files, why?
         arduinocore_proj.get_variable('arduinocore_dep'),
         arduinocore_proj.get_variable('arduinocore_wire_dep'),
+        ens160_dep,
     ],
 )
 
