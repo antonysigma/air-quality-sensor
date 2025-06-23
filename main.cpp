@@ -9,6 +9,7 @@
 #include "components/i2c_port.hpp"
 #include "components/serial.hpp"
 #include "components/temperature_sensor.hpp"
+#include "components/the_main_app.hpp"
 
 namespace {
 struct registered_interfaces {
@@ -22,6 +23,8 @@ struct registered_interfaces {
 using namespace components;
 
 using Heartbeat = Blink<13>;
+using TS = TemperatureSensor<Heartbeat>;
+using GS = GasSensor<Heartbeat>;
 
 struct project {
     static constexpr auto config = cib::components<  //
@@ -30,15 +33,16 @@ struct project {
         SerialPort,                                  //
         Heartbeat,                                   //
         I2CPort,                                     //
-        GasSensor<Heartbeat, SerialPort>,            //
-        TemperatureSensor<SerialPort>                //
-        >;
+        TS,                                          //
+        GS,                                          //
+        controllers::TheMainApp<TS, GS, SerialPort>>;
 };
 
 cib::nexus<project> nexus{};
 
 }  // namespace
 
+// Used by Adafruit_AHTx0 library
 void
 operator delete(void* p, unsigned int) {
     free(p);

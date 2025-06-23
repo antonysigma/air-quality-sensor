@@ -8,7 +8,7 @@
 
 namespace components {
 
-template <class SerialPort>
+template <class Indicator>
 struct TemperatureSensor {
     static inline Adafruit_AHTX0 sensor{};
     static inline bool has_sensor{false};
@@ -20,25 +20,16 @@ struct TemperatureSensor {
     }
 
     constexpr static auto ping_temperature_sensor =
-        flow::action("ping_temperature_sensor"_sc, []() { has_sensor = sensor.begin(); });
+        flow::action("ping_temperature_sensor"_sc, []() {
+            has_sensor = sensor.begin();
+            if (!has_sensor) {
+                Indicator::setMode(Indicator::FAST);
+            }
+        });
 
     constexpr static auto config = cib::config(                                               //
         cib::extend<RuntimeInit>(                                                             //
             core::enable_interrupt >> ping_temperature_sensor >> SerialPort::wait_for_serial  //
-            ),
-        cib::extend<MainLoop>([](const uint32_t current_ms) {
-            static auto prev_ms = Millis();
-            if (current_ms - prev_ms < 5000) {
-                return;
-            }
-            prev_ms = current_ms;
-
-            if (!has_sensor) {
-                Serial.print(F("AHT21 not available\n"));
-                return;
-            }
-
-            SerialPort::print(read());
-        }));
+            ));
 };
 }  // namespace components

@@ -2,7 +2,6 @@ project('adafruit_ahtx0', 'cpp')
 
 ahtx0_lib = static_library('ahtx0',
     sources: 'Adafruit_AHTX0.cpp',
-    pic: false,
     dependencies: [
         dependency('adafruit_sensor'),
         dependency('adafruit_busio'),
