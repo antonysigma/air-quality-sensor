@@ -7,6 +7,19 @@ namespace commands {
 namespace ahtx0 {
 
 #pragma pack(push, 1)
+struct SoftResetCmd {
+    uint8_t cmd{0xBA};
+    uint8_t padding[2]{0, 0};
+};
+static_assert(sizeof(SoftResetCmd) == 3);
+
+struct CalibrateCmd {
+    uint8_t cmd{0xE1};
+    uint8_t reg{0x08};
+    uint8_t padding{0};
+};
+static_assert(sizeof(CalibrateCmd) == 3);
+
 struct TriggerCmd {
     uint8_t cmd{0xAC};
     uint8_t reg{0x33};
@@ -18,6 +31,7 @@ struct Status {
     uint8_t value{0xFF};
 
     constexpr bool isBusy() const { return value & AHTX0_STATUS_BUSY; }
+    constexpr bool isCalibrated() const { return value & AHTX0_STATUS_CALIBRATED; }
 };
 
 struct Measurements {

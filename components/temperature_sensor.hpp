@@ -30,9 +30,27 @@ struct TemperatureSensor {
         // return {temperature.temperature, humidity.relative_humidity};
     }
 
+    constexpr static void wait() {
+        using commands::ahtx0::Status;
+        while (I2CPort::read<Status>(i2c_addr).isBusy()) {
+            delay(10);
+        }
+    }
+
     constexpr static auto ping_temperature_sensor =
         flow::action("ping_temperature_sensor"_sc, []() {
-            has_sensor = sensor.begin();
+            namespace ahtx0 = commands::ahtx0;
+            // Wait for device to power up.
+            delay(20);
+
+            I2CPort::send(i2c_addr, ahtx0::SoftResetCmd{});
+            delay(20);
+            wait();
+
+            I2CPort::send(i2c_addr, ahtx0::CalibrateCmd{});
+            wait();
+
+            has_sensor = I2CPort::read<ahtx0::Status>(i2c_addr).isCalibrated();
             if (!has_sensor) {
                 Indicator::setMode(Indicator::FAST);
             }
