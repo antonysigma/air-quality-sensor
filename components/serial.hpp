@@ -24,15 +24,15 @@ struct SerialPort {
     }
 
     static void print(const data_models::environment_data_t env) {
-        constexpr auto printFloat = [&](const float v) {
+        constexpr auto print = [&](const float v) {
             Serial.print(static_cast<uint8_t>(v));
             Serial.write('.');
-            Serial.print(static_cast<uint8_t>(v * 10) %10);
+            Serial.print(static_cast<uint8_t>(v * 10) % 10);
         };
         Serial.print(F("Temperature: "));
-        printFloat(env.temperature);
+        print(env.temperature);
         Serial.print(F("C\tRH: "));
-        printFloat(env.humidity);
+        print(env.humidity);
         Serial.print(F("%\n"));
     }
 
