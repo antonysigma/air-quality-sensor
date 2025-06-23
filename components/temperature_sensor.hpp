@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Adafruit_AHTX0.h"
 #include "callbacks.hpp"
 #include "core.hpp"
 #include "data-models/ahtx0_commands.hpp"
@@ -9,9 +8,8 @@
 
 namespace components {
 
-template <class Indicator, uint8_t i2c_addr = AHTX0_I2CADDR_DEFAULT>
+template <class Indicator, uint8_t i2c_addr = 0x38>
 struct TemperatureSensor {
-    static inline Adafruit_AHTX0 sensor{};
     static inline bool has_sensor{false};
 
     static data_models::environment_data_t read() {
@@ -24,10 +22,6 @@ struct TemperatureSensor {
 
         const auto measurements = I2CPort::read<ahtx0::Measurements>(i2c_addr);
         return {measurements.temperature(), measurements.humidity()};
-
-        // sensors_event_t humidity, temperature;
-        // sensor.getEvent(&humidity, &temperature);
-        // return {temperature.temperature, humidity.relative_humidity};
     }
 
     constexpr static void wait() {

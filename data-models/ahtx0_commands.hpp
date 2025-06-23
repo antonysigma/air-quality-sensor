@@ -1,5 +1,4 @@
 #pragma once
-#include "Adafruit_AHTX0.h"
 #include "utils/big_endian.hpp"
 
 namespace commands {
@@ -30,8 +29,8 @@ static_assert(sizeof(TriggerCmd) == 3);
 struct Status {
     uint8_t value{0xFF};
 
-    constexpr bool isBusy() const { return value & AHTX0_STATUS_BUSY; }
-    constexpr bool isCalibrated() const { return value & AHTX0_STATUS_CALIBRATED; }
+    constexpr bool isBusy() const { return value & 0x80; }
+    constexpr bool isCalibrated() const { return value & 0x08; }
 };
 
 struct Measurements {
