@@ -28,8 +28,7 @@ struct project {
         core::impl,                                  //
         SerialPort,                                  //
         Heartbeat,                                   //
-        I2CPort,
-        GasSensor<Heartbeat>  //
+        I2CPort, GasSensor<Heartbeat, SerialPort>    //
         >;
 };
 
