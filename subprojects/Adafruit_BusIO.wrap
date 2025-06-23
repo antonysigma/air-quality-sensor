@@ -3,3 +3,6 @@ directory = Adafruit_BusIO
 url = https://github.com/antonysigma/Adafruit_BusIO.git
 revision = avoid-heap-allocation
 depth = 3
+
+[provide]
+adafruit_busio = adafruit_busio_dep

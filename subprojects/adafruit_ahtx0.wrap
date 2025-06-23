@@ -1,0 +1,7 @@
+[wrap-git]
+directory = Adafruit_AHTX0
+url = https://github.com/adafruit/Adafruit_AHTX0.git
+revision = 805eab7199366ae647f122864db4780b05129e5f
+depth = 1
+
+patch_directory = adafruit_ahtx0

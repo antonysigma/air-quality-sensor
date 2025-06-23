@@ -8,6 +8,7 @@
 #include "components/gas_sensor.hpp"
 #include "components/i2c_port.hpp"
 #include "components/serial.hpp"
+#include "components/temperature_sensor.hpp"
 
 namespace {
 struct registered_interfaces {
@@ -28,13 +29,20 @@ struct project {
         core::impl,                                  //
         SerialPort,                                  //
         Heartbeat,                                   //
-        I2CPort, GasSensor<Heartbeat, SerialPort>    //
+        I2CPort,                                     //
+        GasSensor<Heartbeat, SerialPort>,            //
+        TemperatureSensor<SerialPort>                //
         >;
 };
 
 cib::nexus<project> nexus{};
 
 }  // namespace
+
+void
+operator delete(void* p, unsigned int) {
+    free(p);
+}
 
 ISR(TIMER0_COMPA_vect) { nexus.service<OnTimer0Interrupt>(); }
 

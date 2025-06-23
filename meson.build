@@ -16,6 +16,7 @@ arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')
 
 ens160_dep = subproject('ens160').get_variable('ens160_dep')
+ahtx0_dep = subproject('adafruit_ahtx0').get_variable('ahtx0_dep')
 
 main_exe = executable('main',
     sources: [
@@ -34,6 +35,7 @@ main_exe = executable('main',
         arduinocore_proj.get_variable('arduinocore_dep'),
         arduinocore_proj.get_variable('arduinocore_wire_dep'),
         ens160_dep,
+        ahtx0_dep,
     ],
 )
 

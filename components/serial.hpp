@@ -23,6 +23,14 @@ struct SerialPort {
         Serial.print(F("ppm\n"));
     }
 
+    static void print(const data_models::environment_data_t env) {
+        Serial.print(F("Temperature: "));
+        Serial.print(env.temperature);
+        Serial.print(F("\tRH: "));
+        Serial.print(env.humidity);
+        Serial.print(F("%\n"));
+    }
+
     constexpr static auto config = cib::config(cib::extend<RuntimeInit>(
         core::system_clk_init >> setup_serial >> core::enable_interrupt >> wait_for_serial));
 };
