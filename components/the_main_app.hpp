@@ -10,8 +10,8 @@ struct TheMainApp {
         [](const uint32_t current_ms) {
             using components::Millis;
 
-            static auto prev_ms = Millis();
-            if (current_ms - prev_ms < 1000) {
+            static auto prev_ms = current_ms + 10'000;
+            if (current_ms - prev_ms < 30'000) {
                 return;
             }
             prev_ms = current_ms;
@@ -22,7 +22,7 @@ struct TheMainApp {
             }
 
             const auto measurements = GasSensor::read();
-            Display::print(data_models::aqi_t{measurements});
+            Display::update(measurements);
             SerialPort::print(measurements);
         };
 
@@ -42,6 +42,7 @@ struct TheMainApp {
 
         const auto data = TemperatureSensor::read();
         GasSensor::set(data);
+        Display::update(data);
         SerialPort::print(data);
     };
 
