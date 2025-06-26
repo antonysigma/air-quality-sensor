@@ -42,12 +42,6 @@ cib::nexus<project> nexus{};
 
 }  // namespace
 
-// Used by Adafruit_AHTx0 library
-void
-operator delete(void* p, unsigned int) {
-    free(p);
-}
-
 ISR(TIMER0_COMPA_vect) { nexus.service<OnTimer0Interrupt>(); }
 
 int
