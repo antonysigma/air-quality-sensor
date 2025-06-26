@@ -1,0 +1,8 @@
+[wrap-git]
+directory = Adafruit_GFX
+url = https://github.com/adafruit/Adafruit-GFX-Library.git
+revision = 21648a829918c7deaf1b5ab29f736a80e42fb82f
+depth = 1
+
+[provide]
+adafruit_gfx = adafruit_gfx_dep

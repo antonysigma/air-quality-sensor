@@ -3,12 +3,13 @@
 
 namespace controllers {
 
-template <class TemperatureSensor, class GasSensor, class SerialPort>
+template <class TemperatureSensor, class GasSensor, class Display, class SerialPort>
 struct TheMainApp {
     constexpr static auto read_air_quality =
 
         [](const uint32_t current_ms) {
             using components::Millis;
+            using data_models::aqi_t;
 
             static auto prev_ms = Millis();
             if (current_ms - prev_ms < 1000) {
@@ -21,7 +22,9 @@ struct TheMainApp {
                 return;
             }
 
-            SerialPort::print(GasSensor::read());
+            const auto measurements = GasSensor::read();
+            Display::print(aqi_t{measurements});
+            SerialPort::print(measurements);
         };
 
     constexpr static auto read_temperature = [](const uint32_t current_ms) {

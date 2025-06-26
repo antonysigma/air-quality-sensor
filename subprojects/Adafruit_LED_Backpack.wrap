@@ -1,0 +1,5 @@
+[wrap-git]
+directory = Adafruit_LED_Backpack
+url = https://github.com/adafruit/Adafruit_LED_Backpack.git
+revision = c4ec1328fda9e4cbf355f6e407346347b4d207e2
+depth = 1

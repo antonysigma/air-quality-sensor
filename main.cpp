@@ -8,6 +8,7 @@
 #include "components/gas_sensor.hpp"
 #include "components/i2c_port.hpp"
 #include "components/serial.hpp"
+#include "components/seven-segment-display.hpp"
 #include "components/temperature_sensor.hpp"
 #include "components/the_main_app.hpp"
 
@@ -35,7 +36,7 @@ struct project {
         I2CPort,                                     //
         TS,                                          //
         GS,                                          //
-        controllers::TheMainApp<TS, GS, SerialPort>>;
+        SevenSegDisplay<>, controllers::TheMainApp<TS, GS, SevenSegDisplay<>, SerialPort>>;
 };
 
 cib::nexus<project> nexus{};
@@ -43,6 +44,12 @@ cib::nexus<project> nexus{};
 }  // namespace
 
 ISR(TIMER0_COMPA_vect) { nexus.service<OnTimer0Interrupt>(); }
+
+// Used by Adafruit_AHTx0 library
+void
+operator delete(void* p, unsigned int) {
+    free(p);
+}
 
 int
 main() {
