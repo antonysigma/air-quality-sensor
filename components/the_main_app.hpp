@@ -9,7 +9,6 @@ struct TheMainApp {
 
         [](const uint32_t current_ms) {
             using components::Millis;
-            using data_models::aqi_t;
 
             static auto prev_ms = Millis();
             if (current_ms - prev_ms < 1000) {
@@ -23,7 +22,7 @@ struct TheMainApp {
             }
 
             const auto measurements = GasSensor::read();
-            Display::print(aqi_t{measurements});
+            Display::print(data_models::aqi_t{measurements});
             SerialPort::print(measurements);
         };
 

@@ -36,7 +36,8 @@ struct project {
         I2CPort,                                     //
         TS,                                          //
         GS,                                          //
-        SevenSegDisplay<>, controllers::TheMainApp<TS, GS, SevenSegDisplay<>, SerialPort>>;
+        SevenSegDisplay<>,                           //
+        controllers::TheMainApp<TS, GS, SevenSegDisplay<>, SerialPort>>;
 };
 
 cib::nexus<project> nexus{};

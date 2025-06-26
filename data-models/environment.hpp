@@ -19,4 +19,10 @@ struct aqi_t {
 
     constexpr aqi_t(air_quality_t aq) : value{aq.aqi} {}
 };
+
+struct tvoc_t {
+    uint16_t value{};
+
+    constexpr tvoc_t(air_quality_t aq) : value{aq.tvoc} {}
+};
 }  // namespace data_models

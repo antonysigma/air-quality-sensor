@@ -17,13 +17,22 @@ struct SevenSegDisplay {
         flow::action("init_7seg_display"_sc, []() { matrix.begin(i2c_addr); });
 
     constexpr static auto print_init_banner = flow::action("print_init_banner"_sc, []() {
-        matrix.print("Init");
+        matrix.println("Init");
         matrix.writeDisplay();
     });
 
-    static constexpr void print(data_models::aqi_t aqi) {
-        matrix.print("AQI");
-        matrix.print('0' + aqi.value);
+    static constexpr void print(const data_models::aqi_t aqi) {
+        using namespace std::string_view_literals;
+        for (const char& c : "Aq "sv) {
+            matrix.write(c);
+        }
+        matrix.write('0' + aqi.value);
+        matrix.println();
+        matrix.writeDisplay();
+    }
+
+    static constexpr void print(const data_models::tvoc_t data) {
+        matrix.println(data.value);
         matrix.writeDisplay();
     }
 
