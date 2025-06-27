@@ -14,6 +14,11 @@ struct air_quality_t {
     uint16_t eco2{};
 };
 
+}  // namespace data_models
+
+namespace display_commands {
+using data_models::air_quality_t;
+using data_models::environment_data_t;
 struct aqi_t {
     uint8_t value{};
 
@@ -25,4 +30,15 @@ struct tvoc_t {
 
     constexpr tvoc_t(air_quality_t aq) : value{aq.tvoc} {}
 };
-}  // namespace data_models
+
+struct celcius_t {
+    float value{};
+
+    constexpr celcius_t(environment_data_t e) : value{e.temperature} {}
+};
+struct humidity_t {
+    float value{};
+
+    constexpr humidity_t(environment_data_t e) : value{e.humidity} {}
+};
+}  // namespace display_commands

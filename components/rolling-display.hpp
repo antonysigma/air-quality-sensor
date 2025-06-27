@@ -37,13 +37,24 @@ struct StateMachine {
         };
 
         constexpr auto print_tvoc_value = [](const data_models::air_quality_t& aq) {
-            Display::print(data_models::tvoc_t{aq});
+            Display::print(display_commands::tvoc_t{aq});
         };
 
-        constexpr auto print_aqi = [](const data_models::air_quality_t& aq) {
+        constexpr auto print_aqi = [](const display_commands::air_quality_t& aq) {
             using namespace std::string_view_literals;
             Display::print("Aq "sv);
-            Display::print(data_models::aqi_t{aq});
+            Display::print(display_commands::aqi_t{aq});
+        };
+
+        constexpr auto print_temperature = [](const display_commands::environment_data_t& env) {
+            using namespace std::string_view_literals;
+            Display::print("Aq "sv);
+            Display::print(display_commands::celcius_t{env});
+        };
+
+        constexpr auto print_humidity = [](const display_commands::environment_data_t& env) {
+            using namespace std::string_view_literals;
+            Display::print(display_commands::humidity_t{env});
         };
 
         using namespace boost::sml;
@@ -53,7 +64,9 @@ struct StateMachine {
             "Init"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s,
             "TVOCBanner"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_value) = "TVOCValue"_s,
             "TVOCValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_aqi) = "AQI"_s,
-            "AQI"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s
+            "AQI"_s + event<TimeMs>[afterOneSecond] / (update_time, print_temperature) = "TemperatureValue"_s,
+            "TemperatureValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_humidity) = "HumidityValue"_s,
+            "HumidityValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s
             // clang-format on
         );
     }
