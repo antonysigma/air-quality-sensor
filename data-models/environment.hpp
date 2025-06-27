@@ -41,4 +41,9 @@ struct humidity_t {
 
     constexpr humidity_t(environment_data_t e) : value{e.humidity} {}
 };
+struct eco2_t {
+    uint16_t value{};
+
+    constexpr eco2_t(air_quality_t aq) : value{aq.eco2} {}
+};
 }  // namespace display_commands

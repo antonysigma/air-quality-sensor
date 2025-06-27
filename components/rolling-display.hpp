@@ -42,13 +42,11 @@ struct StateMachine {
 
         constexpr auto print_aqi = [](const display_commands::air_quality_t& aq) {
             using namespace std::string_view_literals;
-            Display::print("Aq "sv);
             Display::print(display_commands::aqi_t{aq});
         };
 
         constexpr auto print_temperature = [](const display_commands::environment_data_t& env) {
             using namespace std::string_view_literals;
-            Display::print("Aq "sv);
             Display::print(display_commands::celcius_t{env});
         };
 
@@ -57,16 +55,28 @@ struct StateMachine {
             Display::print(display_commands::humidity_t{env});
         };
 
+        constexpr auto print_eco2_banner = []() {
+            using namespace std::string_view_literals;
+            Display::print("eCO2"sv);
+        };
+
+        constexpr auto print_eco2_value = [](const display_commands::air_quality_t& aq) {
+            using namespace std::string_view_literals;
+            Display::print(display_commands::eco2_t{aq});
+        };
+
         using namespace boost::sml;
         return make_transition_table(
             // clang-format off
             *"Begin"_s + event<TimeMs> / update_time = "Init"_s,
-            "Init"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s,
+            "Init"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_banner) = "eCO2Banner"_s,
+            "eCO2Banner"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_value) = "eCO2Value"_s,
+            "eCO2Value"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s,
             "TVOCBanner"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_value) = "TVOCValue"_s,
             "TVOCValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_aqi) = "AQI"_s,
             "AQI"_s + event<TimeMs>[afterOneSecond] / (update_time, print_temperature) = "TemperatureValue"_s,
             "TemperatureValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_humidity) = "HumidityValue"_s,
-            "HumidityValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s
+            "HumidityValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_banner) = "eCO2Banner"_s
             // clang-format on
         );
     }
