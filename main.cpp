@@ -7,6 +7,7 @@
 #include "components/core.hpp"
 #include "components/gas_sensor.hpp"
 #include "components/i2c_port.hpp"
+#include "components/rolling-display.hpp"
 #include "components/serial.hpp"
 #include "components/seven-segment-display.hpp"
 #include "components/temperature_sensor.hpp"
@@ -26,6 +27,7 @@ using namespace components;
 using Heartbeat = Blink<13>;
 using TS = TemperatureSensor<Heartbeat>;
 using GS = GasSensor<Heartbeat>;
+using RollingDisplay = rolling_display::impl<SevenSegDisplay<>>;
 
 struct project {
     static constexpr auto config = cib::components<  //
@@ -37,7 +39,8 @@ struct project {
         TS,                                          //
         GS,                                          //
         SevenSegDisplay<>,                           //
-        controllers::TheMainApp<TS, GS, SevenSegDisplay<>, SerialPort>>;
+        RollingDisplay,                              //
+        controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>>;
 };
 
 cib::nexus<project> nexus{};
