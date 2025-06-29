@@ -27,7 +27,8 @@ using namespace components;
 using Heartbeat = Blink<13>;
 using TS = TemperatureSensor<Heartbeat>;
 using GS = GasSensor<Heartbeat>;
-using RollingDisplay = rolling_display::impl<SevenSegDisplay<>>;
+using SevenSegDisplay = ::components::seven_seg_display::Impl<I2CPort>;
+using RollingDisplay = rolling_display::impl<SevenSegDisplay>;
 
 struct project {
     static constexpr auto config = cib::components<  //
@@ -38,7 +39,7 @@ struct project {
         I2CPort,                                     //
         TS,                                          //
         GS,                                          //
-        SevenSegDisplay<>,                           //
+        SevenSegDisplay,                             //
         RollingDisplay,                              //
         controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>>;
 };

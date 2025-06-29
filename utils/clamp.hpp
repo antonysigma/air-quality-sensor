@@ -16,4 +16,9 @@ clamp(const T x, const T vmin, const T vmax) {
     return x;
 }
 
+template <typename T>
+constexpr T
+Min(const T a, const T b) {
+    return a < b ? a : b;
+}
 }  // namespace utils

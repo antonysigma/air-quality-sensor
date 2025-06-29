@@ -13,7 +13,11 @@ struct I2CPort {
     template <class Message>
     constexpr static void send(const uint8_t i2c_addr, const Message message) {
         Wire.beginTransmission(i2c_addr);
-        Wire.write(reinterpret_cast<const uint8_t*>(&message), sizeof(Message));
+        if constexpr (sizeof(Message) == 1) {
+            Wire.write(*reinterpret_cast<const uint8_t*>(&message));
+        } else {
+            Wire.write(reinterpret_cast<const uint8_t*>(&message), sizeof(Message));
+        }
         Wire.endTransmission();
     }
 
