@@ -50,12 +50,6 @@ cib::nexus<project> nexus{};
 
 ISR(TIMER0_COMPA_vect) { nexus.service<OnTimer0Interrupt>(); }
 
-// Used by Adafruit_AHTx0 library
-void
-operator delete(void* p, unsigned int) {
-    free(p);
-}
-
 int
 main() {
     nexus.service<RuntimeInit>();

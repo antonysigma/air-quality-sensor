@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Adafruit_GFX.h>
-
 #include <boost/sml.hpp>
 
 #include "callbacks.hpp"
