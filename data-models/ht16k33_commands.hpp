@@ -48,5 +48,5 @@ struct WriteDisplay {
     }
 };
 static_assert(sizeof(WriteDisplay) == 17);
-#pragma pop()
+#pragma pack(pop)
 }  // namespace ht16k33_commands

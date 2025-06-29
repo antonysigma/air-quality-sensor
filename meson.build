@@ -25,6 +25,7 @@ main_exe = executable('main',
     cpp_args: [
         # https://github.com/boost-ext/sml/issues/617
         '-DBOOST_SML_CREATE_DEFAULT_CONSTRUCTIBLE_DEPS',
+        '-Wno-volatile',
     ],
     include_directories: [
         boost_sml_inc,

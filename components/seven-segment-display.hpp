@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Adafruit_GFX.h>
-#include <Adafruit_LEDBackpack.h>
 
 #include <boost/sml.hpp>
 
@@ -119,86 +118,44 @@ constexpr std::array<uint8_t, 96> seven_seg_fonttable{
 
 constexpr uint8_t
 getFont(const char c) {
-    const uint16_t index = c - ' ';
-    if (index > seven_seg_fonttable.size()) {
-        return getFont(' ');
-    }
+    const uint16_t index = utils::Min(static_cast<uint16_t>(c - ' '), seven_seg_fonttable.size());
     return seven_seg_fonttable[index];
 }
 
-class WriteBuffer : public utils::SmallVector<uint8_t, 5> {
-   public:
-    void write(const char c) {
+struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
+    constexpr void write(const char c) {
         emplaceBack(getFont(c));
         // Skip the middle colon (:) LED
         if (size() == 2) {
             emplaceBack(getFont(' '));
         }
     }
-};
-}  // namespace internal
 
-template <class I2CPort, uint8_t i2c_addr = 0x70>
-struct Impl {
-    static inline Adafruit_7segment matrix{};
-
-    constexpr static auto init_7seg_display = flow::action("init_7seg_display"_sc, []() {
-        using namespace ht16k33_commands;
-        matrix.begin(i2c_addr);
-        // I2CPort::send(i2c_addr, OscillatorOn{});
-        // I2CPort::send(i2c_addr, NoBlink{});
-        I2CPort::send(i2c_addr, Brightness{4});
-    });
-
-    // static constexpr void flush() {
-    //     using ht16k33_commands::WriteDisplay;
-    //     I2CPort::send(i2c_addr, WriteDisplay{buffer.sanitizedBuffer()});
-    //     buffer.clear();
-    // }
-
-    static constexpr void println(const std::string_view message) {
-        using ht16k33_commands::WriteDisplay;
-        internal::WriteBuffer write_buffer{};
+    static constexpr WriteBuffer make(const std::string_view message) {
+        WriteBuffer write_buffer{};
         for (const auto& c : message) {
             write_buffer.write(c);
         }
-        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
+        return write_buffer;
     }
 
-    constexpr static auto print_init_banner = flow::action("print_init_banner"_sc, []() {
+    static constexpr WriteBuffer make(const uint16_t value) {
         using namespace std::string_view_literals;
-        println("Init"sv);
-    });
+        WriteBuffer write_buffer{};
+        write_buffer.resize(5);
 
-    static constexpr void print(const uint16_t value) {
-        for(auto [i, v] = std::pair<int8_t, uint16_t>{3, value};
-            i >= 0; i--, v /= 10
-        ) {
+        for (auto [i, v] = std::pair<int8_t, uint16_t>{3, value}; i >= 0; i--, v /= 10) {
             const uint8_t digit = v % 10;
             const uint8_t cursor = (i <= 1 ? i : i + 1);
-            matrix.writeDigitAscii(cursor, (v > 0) ? '0' + digit : ' ', false);
+            write_buffer[cursor] = getFont((v > 0) ? '0' + digit : ' ');
         }
+        return write_buffer;
     }
 
-    static constexpr void print(const display_commands::tvoc_t tvoc) {
-        print(tvoc.value);
-        matrix.println();
-        matrix.writeDisplay();
-    }
+    static constexpr WriteBuffer make(const float value, const bool flush_right) {
+        WriteBuffer write_buffer{};
+        write_buffer.resize(5);
 
-    static constexpr void print(const display_commands::aqi_t data) {
-        using namespace std::string_view_literals;
-        using ht16k33_commands::WriteDisplay;
-
-        internal::WriteBuffer write_buffer{};
-        for (const auto& c : "Aq "sv) {
-            write_buffer.write(c);
-        }
-        write_buffer.write('0' + data.value);
-        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
-    }
-
-    static constexpr void print(const float value, const bool flush_right) {
         const uint8_t scale_factor = (value < 100) ? 10 : 1;
         const auto first_three_digits = static_cast<uint16_t>(value * scale_factor);
 
@@ -209,28 +166,71 @@ struct Impl {
 
             const auto cursor = (i <= 1 ? i : i + 1);
             const auto print_decimal_point = (mag == scale_factor);
-            matrix.writeDigitAscii(cursor, '0' + digit, print_decimal_point);
+            const uint8_t dot = print_decimal_point ? (1 << 7) : 0;
+            write_buffer[cursor] = getFont('0' + digit) | dot;
         }
+
+        return write_buffer;
+    }
+};
+}  // namespace internal
+
+template <class I2CPort, uint8_t i2c_addr = 0x70>
+struct Impl {
+    constexpr static auto init_7seg_display = flow::action("init_7seg_display"_sc, []() {
+        using namespace ht16k33_commands;
+        I2CPort::send(i2c_addr, OscillatorOn{});
+        I2CPort::send(i2c_addr, NoBlink{});
+        I2CPort::send(i2c_addr, Brightness{4});
+    });
+
+    static constexpr void println(const std::string_view message) {
+        using ht16k33_commands::WriteDisplay;
+
+        const auto write_buffer = internal::WriteBuffer::make(message).sanitizedBuffer();
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer});
+    }
+
+    constexpr static auto print_init_banner = flow::action("print_init_banner"_sc, []() {
+        using namespace std::string_view_literals;
+        println("Init"sv);
+    });
+
+    static constexpr void print(const display_commands::tvoc_t tvoc) {
+        using ht16k33_commands::WriteDisplay;
+        const auto write_buffer = internal::WriteBuffer::make(tvoc.value).sanitizedBuffer();
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer});
+    }
+
+    static constexpr void print(const display_commands::aqi_t data) {
+        using namespace std::string_view_literals;
+        using ht16k33_commands::WriteDisplay;
+
+        auto write_buffer = internal::WriteBuffer::make("Aq "sv);
+        write_buffer.write('0' + data.value);
+
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
     static constexpr void print(const display_commands::celcius_t deg_c) {
-        print(deg_c.value, false);
-        matrix.writeDigitAscii(4, 'C');
-        matrix.println();
-        matrix.writeDisplay();
+        using ht16k33_commands::WriteDisplay;
+        auto write_buffer = internal::WriteBuffer::make(deg_c.value, false);
+        write_buffer[4] = internal::getFont('C');
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
     static constexpr void print(const display_commands::humidity_t humidity) {
-        print(humidity.value, true);
-        matrix.writeDigitAscii(0, 'H');
-        matrix.println();
-        matrix.writeDisplay();
+        using ht16k33_commands::WriteDisplay;
+        auto write_buffer = internal::WriteBuffer::make(humidity.value, true);
+        write_buffer[0] = internal::getFont('H');
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
     static constexpr void print(const display_commands::eco2_t co2_concentration) {
-        print(co2_concentration.value);
-        matrix.println();
-        matrix.writeDisplay();
+        using ht16k33_commands::WriteDisplay;
+        const auto write_buffer =
+            internal::WriteBuffer::make(co2_concentration.value).sanitizedBuffer();
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer});
     }
 
     constexpr static auto config = cib::config(  //
