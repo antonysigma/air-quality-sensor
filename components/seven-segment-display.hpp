@@ -156,26 +156,18 @@ struct Impl {
     //     buffer.clear();
     // }
 
-    static constexpr void print(const std::string_view message) {
+    static constexpr void println(const std::string_view message) {
         using ht16k33_commands::WriteDisplay;
         internal::WriteBuffer write_buffer{};
         for (const auto& c : message) {
             write_buffer.write(c);
         }
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
-        // for (const auto& c : message) {
-        //     matrix.write(c);
-        // }
-        // matrix.println();
-        // matrix.writeDisplay();
     }
 
     constexpr static auto print_init_banner = flow::action("print_init_banner"_sc, []() {
         using namespace std::string_view_literals;
-        print("Init"sv);
-        // flush();
-        // matrix.println("Init");
-        // matrix.writeDisplay();
+        println("Init"sv);
     });
 
     static constexpr void print(const uint16_t value) {
@@ -195,10 +187,15 @@ struct Impl {
     }
 
     static constexpr void print(const display_commands::aqi_t data) {
-        matrix.print("Aq ");
-        matrix.write('0' + data.value);
-        matrix.println();
-        matrix.writeDisplay();
+        using namespace std::string_view_literals;
+        using ht16k33_commands::WriteDisplay;
+
+        internal::WriteBuffer write_buffer{};
+        for (const auto& c : "Aq "sv) {
+            write_buffer.write(c);
+        }
+        write_buffer.write('0' + data.value);
+        I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
     static constexpr void print(const float value, const bool flush_right) {

@@ -33,7 +33,7 @@ struct StateMachine {
         // Actions
         constexpr auto print_tvoc_banner = []() {
             using namespace std::string_view_literals;
-            Display::print("tVoC"sv);
+            Display::println("tVoC"sv);
         };
 
         constexpr auto print_tvoc_value = [](const data_models::air_quality_t& aq) {
@@ -57,7 +57,7 @@ struct StateMachine {
 
         constexpr auto print_eco2_banner = []() {
             using namespace std::string_view_literals;
-            Display::print("eCO2"sv);
+            Display::println("eCO2"sv);
         };
 
         constexpr auto print_eco2_value = [](const display_commands::air_quality_t& aq) {
