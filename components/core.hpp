@@ -24,13 +24,13 @@ prescalerRegisterValue() {
     static_assert(factor == 8 || factor == 64 || factor == 256 || factor == 1024);
     switch (factor) {
         case 1024:
-            return (1 << CS02) | (1 << CS00);
+            return (1u << CS02) | (1u << CS00);
         case 256:
-            return (1 << CS02);
+            return (1u << CS02);
         case 64:
-            return (1 << CS01) | (1 << CS00);
+            return (1u << CS01) | (1u << CS00);
         case 8:
-            return (1 << CS01);
+            return (1u << CS01);
         default:
             return 0;
     }
@@ -77,9 +77,9 @@ constexpr static auto system_clk_init = flow::action("system_clk_init"_sc, []() 
 static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
     constexpr auto prescaler = 64UL;
 
-    TCCR0A = TCCR0A | (1 << WGM01);                                         // Set the CTC mode
+    TCCR0A = TCCR0A | (1u << WGM01);                                        // Set the CTC mode
     OCR0A = overflowRegisterValue<prescaler, timer0.interrupt_interval>();  // Set the value for 1ms
-    TIMSK0 = TIMSK0 | (1 << OCIE0A);  // Set the interrupt request
+    TIMSK0 = TIMSK0 | (1u << OCIE0A);  // Set the interrupt request
 
     TCCR0B = TCCR0B | prescalerRegisterValue<prescaler>();  // Set the prescale 1/64 clock
 });

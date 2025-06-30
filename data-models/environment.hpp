@@ -22,28 +22,28 @@ using data_models::EnvironmentData;
 struct Aqi {
     uint8_t value{};
 
-    constexpr Aqi(AirQuality aq) : value{aq.aqi} {}
+    constexpr explicit Aqi(AirQuality aq) : value{aq.aqi} {}
 };
 
 struct TVoc {
     uint16_t value{};
 
-    constexpr TVoc(AirQuality aq) : value{aq.tvoc} {}
+    constexpr explicit TVoc(AirQuality aq) : value{aq.tvoc} {}
 };
 
 struct Celcius {
     float value{};
 
-    constexpr Celcius(EnvironmentData e) : value{e.temperature} {}
+    constexpr explicit Celcius(EnvironmentData e) : value{e.temperature} {}
 };
 struct Humidity {
     float value{};
 
-    constexpr Humidity(EnvironmentData e) : value{e.humidity} {}
+    constexpr explicit Humidity(EnvironmentData e) : value{e.humidity} {}
 };
 struct ECo2 {
     uint16_t value{};
 
-    constexpr ECo2(AirQuality aq) : value{aq.eco2} {}
+    constexpr explicit ECo2(AirQuality aq) : value{aq.eco2} {}
 };
 }  // namespace display_commands

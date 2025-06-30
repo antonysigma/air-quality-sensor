@@ -29,8 +29,8 @@ static_assert(sizeof(TriggerCmd) == 3);
 struct Status {
     uint8_t value{0xFF};
 
-    [[nodiscard]] constexpr bool isBusy() const { return value & 0x80; }
-    [[nodiscard]] constexpr bool isCalibrated() const { return value & 0x08; }
+    [[nodiscard]] constexpr bool isBusy() const { return value & 0x80u; }
+    [[nodiscard]] constexpr bool isCalibrated() const { return value & 0x08u; }
 };
 
 struct Measurements {
@@ -48,7 +48,7 @@ struct Measurements {
     } data{};
 
     [[nodiscard]] constexpr float temperature() const {
-        const auto masked = static_cast<uint32_t>(data.temperature.raw) & 0x0F'FFFF;
+        const auto masked = static_cast<uint32_t>(data.temperature.raw) & 0x0F'FFFFu;
         return static_cast<float>(masked) * (200.0f / 0x100'000) - 50;
     }
 

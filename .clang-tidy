@@ -6,6 +6,7 @@ performance-*,
 modernize-*,
 google-readability-*,
 cppcoreguidelines-*,
+hicpp-*,
 readability-identifier-naming,
 -clang-diagnostic-c++11-narrowing,
 -clang-diagnostic-unused-command-line-argument,
@@ -16,6 +17,8 @@ readability-identifier-naming,
 -modernize-use-trailing-return-type,
 -modernize-concat-nested-namespaces,
 -modernize-avoid-c-arrays,
+-hicpp-avoid-c-arrays,
+-hicpp-uppercase-literal-suffix,
 -bugprone-dynamic-static-initializers'
 
 UseColor: true
@@ -65,3 +68,5 @@ CheckOptions:
     value:           ''
   - key:             readability-identifier-naming.VariableSuffix
     value:           ''
+  - key:             hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
+    value:           true
