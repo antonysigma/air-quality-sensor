@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <span>
 
 #include "utils/clamp.hpp"
 
@@ -29,7 +30,7 @@ struct NoBlink : BlinkRate {
 };
 
 struct OscillatorOn {
-    const uint8_t buffer{0x21};
+    uint8_t buffer{0x21};
 };
 
 struct AnodeCathode {
@@ -47,7 +48,8 @@ struct WriteDisplay {
     AnodeCathode padding[3]{};
 
     constexpr WriteDisplay(const std::array<uint8_t, 5>& raw) {
-        std::copy(raw.begin(), raw.end(), buffer);
+        const auto buffer_view = std::span{buffer};
+        std::copy(raw.begin(), raw.end(), buffer_view.begin());
     }
 };
 static_assert(sizeof(WriteDisplay) == 17);

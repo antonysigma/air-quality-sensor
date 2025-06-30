@@ -36,7 +36,7 @@ struct Status {
 struct Measurements {
     uint8_t padding{};
     union {
-        uint8_t buffer[5];
+        uint8_t buffer[5]{};
         struct {
             uint8_t padding{};
             be::UInt32 raw{};

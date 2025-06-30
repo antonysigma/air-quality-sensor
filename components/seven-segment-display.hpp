@@ -117,8 +117,9 @@ constexpr std::array<uint8_t, 96> seven_seg_fonttable{
 
 constexpr uint8_t
 getFont(const char c) {
-    const uint16_t index = utils::Min(static_cast<uint16_t>(c - ' '), seven_seg_fonttable.size());
-    return seven_seg_fonttable[index];
+    const uint16_t index =
+        utils::Min(static_cast<uint16_t>(c - ' '), seven_seg_fonttable.size() - 1);
+    return seven_seg_fonttable[index];  // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
 struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {

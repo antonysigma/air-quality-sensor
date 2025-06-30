@@ -8,7 +8,9 @@
 
 namespace components {
 
-static volatile uint32_t millis_value = 0;
+static volatile uint32_t
+    millis_value =  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    0;
 uint32_t
 Millis() {  // NOLINT(readability-identifier-naming)
     return millis_value;

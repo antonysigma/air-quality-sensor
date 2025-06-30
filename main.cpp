@@ -44,7 +44,7 @@ struct Project {
         controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>>;
 };
 
-cib::nexus<Project> nexus{};
+constexpr cib::nexus<Project> nexus{};
 
 }  // namespace
 

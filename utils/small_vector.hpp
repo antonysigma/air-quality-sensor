@@ -17,7 +17,7 @@ class SmallVector {
             return;
         }
 
-        buffer[_size] = value;
+        buffer[_size] = std::move(value);
         _size++;
     }
 
