@@ -10,7 +10,7 @@ namespace components {
 
 static volatile uint32_t millis_value = 0;
 uint32_t
-Millis() {
+Millis() {  // NOLINT(readability-identifier-naming)
     return millis_value;
 }
 
@@ -37,7 +37,7 @@ prescalerRegisterValue() {
 template <uint16_t prescaler_value, units::Microsecond<uint32_t> time_interval>
 constexpr uint8_t
 overflowRegisterValue() {
-    static_assert(uint64_t(timer0.freq * time_interval) % prescaler_value == 0,
+    static_assert(static_cast<uint64_t>(timer0.freq * time_interval) % prescaler_value == 0,
                   "Timer0 period must be a multiple of prescaler");
 
     constexpr auto overflow_value =
@@ -82,7 +82,7 @@ static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
     TCCR0B = TCCR0B | prescalerRegisterValue<prescaler>();  // Set the prescale 1/64 clock
 });
 
-struct impl {
+struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
             disable_interrupt >> system_clk_init >> timer0_init >> enable_interrupt  //

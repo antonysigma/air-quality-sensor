@@ -18,7 +18,7 @@ clamp(const T x, const T vmin, const T vmax) {
 
 template <typename T>
 constexpr T
-Min(const T a, const T b) {
+Min(const T a, const T b) {  // NOLINT(readability-identifier-naming)
     return a < b ? a : b;
 }
 }  // namespace utils

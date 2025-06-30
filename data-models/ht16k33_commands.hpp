@@ -11,7 +11,8 @@ struct Brightness {
     static constexpr uint8_t brightness_cmd{0xE0};
     uint8_t value;
 
-    constexpr Brightness(uint8_t b) : value(brightness_cmd | utils::Min(b, uint8_t(15))) {}
+    constexpr Brightness(uint8_t b)
+        : value(brightness_cmd | utils::Min(b, static_cast<uint8_t>(15))) {}
 };
 
 struct BlinkRate {
@@ -20,7 +21,7 @@ struct BlinkRate {
 
     uint8_t buffer;
     constexpr BlinkRate(uint8_t rate)
-        : buffer(blink_cmd | display_on | (utils::Min(rate, uint8_t(2)) << 1)) {}
+        : buffer(blink_cmd | display_on | (utils::Min(rate, static_cast<uint8_t>(2)) << 1)) {}
 };
 
 struct NoBlink : BlinkRate {

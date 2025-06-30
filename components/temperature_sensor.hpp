@@ -12,7 +12,7 @@ template <class Indicator, class I2CPort, uint8_t i2c_addr = 0x38>
 struct TemperatureSensor {
     static inline bool has_sensor{false};
 
-    static data_models::environment_data_t read() {
+    static data_models::EnvironmentData read() {
         namespace ahtx0 = commands::ahtx0;
 
         I2CPort::send(i2c_addr, ahtx0::TriggerCmd{});

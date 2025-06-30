@@ -15,7 +15,7 @@ struct SerialPort {
         }
     });
 
-    static void print(const data_models::air_quality_t aq) {
+    static void print(const data_models::AirQuality aq) {
         Serial.print(F("AQI: "));
         Serial.print(aq.aqi);
         Serial.print(F("\tTVOC: "));
@@ -25,7 +25,7 @@ struct SerialPort {
         Serial.print(F("ppm\n"));
     }
 
-    static void print(const data_models::environment_data_t env) {
+    static void print(const data_models::EnvironmentData env) {
         constexpr auto print = [&](const float v) {
             Serial.print(static_cast<uint8_t>(v));
             Serial.write('.');

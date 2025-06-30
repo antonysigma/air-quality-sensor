@@ -14,7 +14,7 @@
 #include "components/the_main_app.hpp"
 
 namespace {
-struct registered_interfaces {
+struct RegisteredInterfaces {
     static constexpr auto config = cib::config(  //
         cib::exports<RuntimeInit>,               //
         cib::exports<MainLoop>,                  //
@@ -28,12 +28,12 @@ using Heartbeat = Blink<13>;
 using TS = TemperatureSensor<Heartbeat, I2CPort>;
 using GS = GasSensor<Heartbeat>;
 using SevenSegDisplay = ::components::seven_seg_display::Impl<I2CPort>;
-using RollingDisplay = rolling_display::impl<SevenSegDisplay>;
+using RollingDisplay = rolling_display::Impl<SevenSegDisplay>;
 
-struct project {
+struct Project {
     static constexpr auto config = cib::components<  //
-        registered_interfaces,                       //
-        core::impl,                                  //
+        RegisteredInterfaces,                        //
+        core::Impl,                                  //
         SerialPort,                                  //
         Heartbeat,                                   //
         I2CPort,                                     //
@@ -44,7 +44,7 @@ struct project {
         controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>>;
 };
 
-cib::nexus<project> nexus{};
+cib::nexus<Project> nexus{};
 
 }  // namespace
 

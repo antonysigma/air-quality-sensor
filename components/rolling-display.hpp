@@ -19,7 +19,7 @@ struct StateMachine {
     auto operator()() {
         using data_models::TimeMs;
         // Guards
-        auto afterOneSecond = [&](const TimeMs current_ms) -> bool {
+        auto after_one_second = [&](const TimeMs current_ms) -> bool {
             constexpr auto update_interval_ms = 1000;
             return current_ms.value - prev_ms >= update_interval_ms;
         };
@@ -33,23 +33,23 @@ struct StateMachine {
             Display::println("tVoC"sv);
         };
 
-        constexpr auto print_tvoc_value = [](const data_models::air_quality_t& aq) {
-            Display::print(display_commands::tvoc_t{aq});
+        constexpr auto print_tvoc_value = [](const data_models::AirQuality& aq) {
+            Display::print(display_commands::TVoc{aq});
         };
 
-        constexpr auto print_aqi = [](const display_commands::air_quality_t& aq) {
+        constexpr auto print_aqi = [](const display_commands::AirQuality& aq) {
             using namespace std::string_view_literals;
-            Display::print(display_commands::aqi_t{aq});
+            Display::print(display_commands::Aqi{aq});
         };
 
-        constexpr auto print_temperature = [](const display_commands::environment_data_t& env) {
+        constexpr auto print_temperature = [](const display_commands::EnvironmentData& env) {
             using namespace std::string_view_literals;
-            Display::print(display_commands::celcius_t{env});
+            Display::print(display_commands::Celcius{env});
         };
 
-        constexpr auto print_humidity = [](const display_commands::environment_data_t& env) {
+        constexpr auto print_humidity = [](const display_commands::EnvironmentData& env) {
             using namespace std::string_view_literals;
-            Display::print(display_commands::humidity_t{env});
+            Display::print(display_commands::Humidity{env});
         };
 
         constexpr auto print_eco2_banner = []() {
@@ -57,23 +57,23 @@ struct StateMachine {
             Display::println("eCO2"sv);
         };
 
-        constexpr auto print_eco2_value = [](const display_commands::air_quality_t& aq) {
+        constexpr auto print_eco2_value = [](const display_commands::AirQuality& aq) {
             using namespace std::string_view_literals;
-            Display::print(display_commands::eco2_t{aq});
+            Display::print(display_commands::ECo2{aq});
         };
 
         using namespace boost::sml;
         return make_transition_table(
             // clang-format off
             *"Begin"_s + event<TimeMs> / update_time = "Init"_s,
-            "Init"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_banner) = "eCO2Banner"_s,
-            "eCO2Banner"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_value) = "eCO2Value"_s,
-            "eCO2Value"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_banner) = "TVOCBanner"_s,
-            "TVOCBanner"_s + event<TimeMs>[afterOneSecond] / (update_time, print_tvoc_value) = "TVOCValue"_s,
-            "TVOCValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_aqi) = "AQI"_s,
-            "AQI"_s + event<TimeMs>[afterOneSecond] / (update_time, print_temperature) = "TemperatureValue"_s,
-            "TemperatureValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_humidity) = "HumidityValue"_s,
-            "HumidityValue"_s + event<TimeMs>[afterOneSecond] / (update_time, print_eco2_banner) = "eCO2Banner"_s
+            "Init"_s + event<TimeMs>[after_one_second] / (update_time, print_eco2_banner) = "eCO2Banner"_s,
+            "eCO2Banner"_s + event<TimeMs>[after_one_second] / (update_time, print_eco2_value) = "eCO2Value"_s,
+            "eCO2Value"_s + event<TimeMs>[after_one_second] / (update_time, print_tvoc_banner) = "TVOCBanner"_s,
+            "TVOCBanner"_s + event<TimeMs>[after_one_second] / (update_time, print_tvoc_value) = "TVOCValue"_s,
+            "TVOCValue"_s + event<TimeMs>[after_one_second] / (update_time, print_aqi) = "AQI"_s,
+            "AQI"_s + event<TimeMs>[after_one_second] / (update_time, print_temperature) = "TemperatureValue"_s,
+            "TemperatureValue"_s + event<TimeMs>[after_one_second] / (update_time, print_humidity) = "HumidityValue"_s,
+            "HumidityValue"_s + event<TimeMs>[after_one_second] / (update_time, print_eco2_banner) = "eCO2Banner"_s
             // clang-format on
         );
     }
@@ -82,13 +82,13 @@ struct StateMachine {
 }  // namespace internal
 
 template <class Display>
-struct impl {
-    static inline data_models::air_quality_t air_quality{};
-    static inline data_models::environment_data_t env{};
+struct Impl {
+    static inline data_models::AirQuality air_quality{};
+    static inline data_models::EnvironmentData env{};
 
-    static constexpr void update(const data_models::air_quality_t aq) { air_quality = aq; }
+    static constexpr void update(const data_models::AirQuality aq) { air_quality = aq; }
 
-    static constexpr void update(const data_models::environment_data_t e) { env = e; }
+    static constexpr void update(const data_models::EnvironmentData e) { env = e; }
 
     constexpr static auto config = cib::config(  //
         cib::extend<MainLoop>([](const uint32_t current_ms) {

@@ -5,7 +5,7 @@
 
 namespace components {
 
-// TODO: define a struct io_def_t instead of uint8_t.
+// TODO(antony): define a struct io_def_t instead of uint8_t.
 template <uint8_t led_id>
 struct Blink {
     enum blink_interval_t : uint16_t {  // NOLINT(performance-enum-size)
@@ -21,7 +21,7 @@ struct Blink {
     constexpr static auto config = cib::config(
         cib::extend<RuntimeInit>(core::disable_interrupt >> init_led >> core::enable_interrupt),
         cib::extend<MainLoop>([](const uint32_t current_ms) {
-            // TODO: decouple GPIO component and the application.
+            // TODO(antony): decouple GPIO component and the application.
 
             static auto prev_ms = Millis();
             if (current_ms - prev_ms < blink_interval) {

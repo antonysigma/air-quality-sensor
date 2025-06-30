@@ -13,7 +13,7 @@ struct GasSensor {
     static inline ScioSense_ENS160 sensor{i2c_addr};
     static inline bool has_sensor{false};
 
-    static bool set(const data_models::environment_data_t data) {
+    static bool set(const data_models::EnvironmentData data) {
         return sensor.set_envdata(data.temperature, data.humidity);
     }
 
@@ -26,7 +26,7 @@ struct GasSensor {
         sensor.setMode(ENS160_OPMODE_STD);
     });
 
-    static data_models::air_quality_t read() {
+    static data_models::AirQuality read() {
         sensor.measure(false);
         sensor.measureRaw(false);
 

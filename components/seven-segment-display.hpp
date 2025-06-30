@@ -197,13 +197,13 @@ struct Impl {
         println("Init"sv);
     });
 
-    static constexpr void print(const display_commands::tvoc_t tvoc) {
+    static constexpr void print(const display_commands::TVoc tvoc) {
         using ht16k33_commands::WriteDisplay;
         const auto write_buffer = internal::WriteBuffer::make(tvoc.value).sanitizedBuffer();
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer});
     }
 
-    static constexpr void print(const display_commands::aqi_t data) {
+    static constexpr void print(const display_commands::Aqi data) {
         using namespace std::string_view_literals;
         using ht16k33_commands::WriteDisplay;
 
@@ -213,21 +213,21 @@ struct Impl {
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
-    static constexpr void print(const display_commands::celcius_t deg_c) {
+    static constexpr void print(const display_commands::Celcius deg_c) {
         using ht16k33_commands::WriteDisplay;
         auto write_buffer = internal::WriteBuffer::make(deg_c.value, false);
         write_buffer[4] = internal::getFont('C');
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
-    static constexpr void print(const display_commands::humidity_t humidity) {
+    static constexpr void print(const display_commands::Humidity humidity) {
         using ht16k33_commands::WriteDisplay;
         auto write_buffer = internal::WriteBuffer::make(humidity.value, true);
         write_buffer[0] = internal::getFont('H');
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }
 
-    static constexpr void print(const display_commands::eco2_t co2_concentration) {
+    static constexpr void print(const display_commands::ECo2 co2_concentration) {
         using ht16k33_commands::WriteDisplay;
         const auto write_buffer =
             internal::WriteBuffer::make(co2_concentration.value).sanitizedBuffer();
