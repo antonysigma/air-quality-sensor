@@ -8,7 +8,10 @@ namespace components {
 // TODO: define a struct io_def_t instead of uint8_t.
 template <uint8_t led_id>
 struct Blink {
-    enum blink_interval_t : uint16_t { FAST = 200, SLOW = 1000 };
+    enum blink_interval_t : uint16_t {  // NOLINT(performance-enum-size)
+        FAST = 200,
+        SLOW = 1000
+    };
     static inline blink_interval_t blink_interval{SLOW};
 
     static void setMode(const blink_interval_t m) { blink_interval = m; }
