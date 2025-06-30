@@ -10,8 +10,10 @@ struct SerialPort {
     constexpr static auto setup_serial =
         flow::action("setup_serial"_sc, []() { Serial.begin(115'200); });
 
-    constexpr static auto wait_for_serial =
-        flow::action("wait_for_serial"_sc, []() { while (!Serial); });
+    constexpr static auto wait_for_serial = flow::action("wait_for_serial"_sc, []() {
+        while (!Serial) {
+        }
+    });
 
     static void print(const data_models::air_quality_t aq) {
         Serial.print(F("AQI: "));

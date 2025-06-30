@@ -8,7 +8,7 @@
 
 namespace components {
 
-template <class Indicator, uint8_t i2c_addr = 0x38>
+template <class Indicator, class I2CPort, uint8_t i2c_addr = 0x38>
 struct TemperatureSensor {
     static inline bool has_sensor{false};
 
@@ -16,17 +16,17 @@ struct TemperatureSensor {
         namespace ahtx0 = commands::ahtx0;
 
         I2CPort::send(i2c_addr, ahtx0::TriggerCmd{});
-        while (I2CPort::read<ahtx0::Status>(i2c_addr).isBusy()) {
+        while (I2CPort::template read<ahtx0::Status>(i2c_addr).isBusy()) {
             delay(10);
         }
 
-        const auto measurements = I2CPort::read<ahtx0::Measurements>(i2c_addr);
+        const auto measurements = I2CPort::template read<ahtx0::Measurements>(i2c_addr);
         return {measurements.temperature(), measurements.humidity()};
     }
 
     constexpr static void wait() {
         using commands::ahtx0::Status;
-        while (I2CPort::read<Status>(i2c_addr).isBusy()) {
+        while (I2CPort::template read<Status>(i2c_addr).isBusy()) {
             delay(10);
         }
     }
@@ -44,7 +44,7 @@ struct TemperatureSensor {
             I2CPort::send(i2c_addr, ahtx0::CalibrateCmd{});
             wait();
 
-            has_sensor = I2CPort::read<ahtx0::Status>(i2c_addr).isCalibrated();
+            has_sensor = I2CPort::template read<ahtx0::Status>(i2c_addr).isCalibrated();
             if (!has_sensor) {
                 Indicator::setMode(Indicator::FAST);
             }

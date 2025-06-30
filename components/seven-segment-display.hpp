@@ -7,6 +7,7 @@
 #include "data-models/environment.hpp"
 #include "data-models/ht16k33_commands.hpp"
 #include "data-models/timing.hpp"
+#include "serial.hpp"
 #include "utils/small_vector.hpp"
 
 namespace components {
@@ -145,7 +146,7 @@ struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
         for (auto [i, v] = std::pair<int8_t, uint16_t>{3, value}; i >= 0; i--, v /= 10) {
             const uint8_t digit = v % 10;
             const uint8_t cursor = (i <= 1 ? i : i + 1);
-            write_buffer[cursor] = getFont((v > 0) ? '0' + digit : ' ');
+            write_buffer[cursor] = getFont((v > 0) ? static_cast<char>('0' + digit) : ' ');
         }
         return write_buffer;
     }
@@ -158,14 +159,16 @@ struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
         const auto first_three_digits = static_cast<uint16_t>(value * scale_factor);
 
         static_assert(uint8_t{1} / 10 < 1);
-        for (auto [i, mag] = std::make_pair<uint8_t, uint16_t>(flush_right, 100);
-             mag >= 1 && i < flush_right + 3; mag /= 10, i++) {
+        const uint8_t end_position = flush_right + 3;
+        for (auto [i, mag] = std::make_pair<uint8_t, uint16_t>(  // NOLINT(bugprone-infinite-loop)
+                 flush_right, 100);
+             (i < end_position) && (mag >= 1); ++i, mag /= 10) {
             const uint8_t digit = (first_three_digits / mag) % 10;
 
             const auto cursor = (i <= 1 ? i : i + 1);
             const auto print_decimal_point = (mag == scale_factor);
             const uint8_t dot = print_decimal_point ? (1 << 7) : 0;
-            write_buffer[cursor] = getFont('0' + digit) | dot;
+            write_buffer[cursor] = getFont(static_cast<char>('0' + digit)) | dot;
         }
 
         return write_buffer;
@@ -205,7 +208,7 @@ struct Impl {
         using ht16k33_commands::WriteDisplay;
 
         auto write_buffer = internal::WriteBuffer::make("Aq "sv);
-        write_buffer.write('0' + data.value);
+        write_buffer.write(static_cast<char>('0' + data.value));
 
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer.sanitizedBuffer()});
     }

@@ -4,6 +4,7 @@
 
 #include "callbacks.hpp"
 #include "config.h"
+#include "utils/log2.hpp"
 
 namespace components {
 
@@ -54,7 +55,7 @@ clockPrescaler() {
 
     static_assert(division <= 256);
     static_assert(__builtin_popcount(division) == 1, "Must be power of two");
-    return std::log2(division);
+    return utils::log2(division);
 }
 static_assert(clockPrescaler<16e3_kHz>() == 0x01);
 static_assert(clockPrescaler<8e3_kHz>() == 0x02);

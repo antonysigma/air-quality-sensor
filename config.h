@@ -8,7 +8,7 @@ using units::literals::operator""_ms;
 struct Timer {
     units::Microsecond<uint32_t> interrupt_interval{};
     units::KiloHertz freq{};
-    enum usage_t { INTERRUPT, PHASE_CORRECT_PWM } usage{INTERRUPT};
+    enum usage_t : uint8_t { INTERRUPT, PHASE_CORRECT_PWM } usage{INTERRUPT};
 };
 
 // Chipset LGT8 has 32MHz clock.

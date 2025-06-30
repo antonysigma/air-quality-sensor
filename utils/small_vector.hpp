@@ -1,5 +1,8 @@
 #pragma once
 #include <array>
+#include <cstdint>
+
+#include "utils/clamp.hpp"
 
 namespace utils {
 
@@ -18,7 +21,7 @@ class SmallVector {
         _size++;
     }
 
-    constexpr uint16_t size() const { return _size; }
+    [[nodiscard]] constexpr uint16_t size() const { return _size; }
 
     constexpr void clear() { _size = 0; }
 
@@ -38,6 +41,6 @@ class SmallVector {
 
     constexpr const T* begin() const { return buffer.begin(); }
 
-    constexpr const T* end() const { return buffer.begin() + size; }
+    constexpr const T* end() const { return buffer.begin() + _size; }
 };
 }  // namespace utils

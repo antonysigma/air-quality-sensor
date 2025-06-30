@@ -29,8 +29,8 @@ static_assert(sizeof(TriggerCmd) == 3);
 struct Status {
     uint8_t value{0xFF};
 
-    constexpr bool isBusy() const { return value & 0x80; }
-    constexpr bool isCalibrated() const { return value & 0x08; }
+    [[nodiscard]] constexpr bool isBusy() const { return value & 0x80; }
+    [[nodiscard]] constexpr bool isCalibrated() const { return value & 0x08; }
 };
 
 struct Measurements {
@@ -47,12 +47,12 @@ struct Measurements {
         } humidity;
     } data{};
 
-    constexpr float temperature() const {
+    [[nodiscard]] constexpr float temperature() const {
         const auto masked = static_cast<uint32_t>(data.temperature.raw) & 0x0F'FFFF;
         return static_cast<float>(masked) * (200.0f / 0x100'000) - 50;
     }
 
-    constexpr float humidity() const {
+    [[nodiscard]] constexpr float humidity() const {
         const auto masked = static_cast<uint32_t>(data.humidity.raw) >> 12;
         return static_cast<float>(masked) * (100.0f / 0x100'000);
     }
@@ -61,8 +61,8 @@ struct Measurements {
 
 static_assert(sizeof(Measurements) == sizeof(uint8_t) * 6);
 static_assert(sizeof(Measurements::data) == sizeof(uint8_t) * 5);
-static_assert(offsetof(Measurements, data.temperature.raw) == 2);
-static_assert(offsetof(Measurements, data.humidity.raw) == 1);
+static_assert(__builtin_offsetof(Measurements, data.temperature.raw) == 2);
+static_assert(__builtin_offsetof(Measurements, data.humidity.raw) == 1);
 
 }  // namespace ahtx0
 
