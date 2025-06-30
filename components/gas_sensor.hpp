@@ -10,6 +10,7 @@ namespace components {
 
 template <class Indicator, uint8_t i2c_addr = ENS160_I2CADDR_1>
 struct GasSensor {
+    // TODO(antony): Handroll our own ENS160 library.
     static inline ScioSense_ENS160 sensor{i2c_addr};
     static inline bool has_sensor{false};
 
