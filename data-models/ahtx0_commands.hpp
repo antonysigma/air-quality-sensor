@@ -34,16 +34,23 @@ struct Status {
 };
 
 struct Measurements {
-    uint8_t padding{};
+#if 0
+    // C-Struct bit fields not compatible to little-endian systems.
+    uint8_t : 8;
+    uint32_t humidity:20;
+    uint32_t temperature:20;
+#endif
+
+    uint8_t : 8;
     union {
         uint8_t buffer[5]{};
         struct {
-            uint8_t padding{};
+            uint8_t : 8;
             be::UInt32 raw{};
         } temperature;
         struct {
             be::UInt32 raw{};
-            uint8_t padding{};
+            uint8_t : 8;
         } humidity;
     } data{};
 
