@@ -43,25 +43,19 @@ struct Measurements {
 
     uint8_t : 8;
     union {
-        uint8_t buffer[5]{};
         struct {
             uint8_t : 8;
-            be::UInt32 raw{};
+            be::UInt32<20, 0> raw{};
         } temperature;
-        struct {
-            be::UInt32 raw{};
-            uint8_t : 8;
-        } humidity;
+        be::UInt32<20, 12> humidity_raw{};
     } data{};
 
     [[nodiscard]] constexpr float temperature() const {
-        const auto masked = static_cast<uint32_t>(data.temperature.raw) & 0x0F'FFFFu;
-        return static_cast<float>(masked) * (200.0f / 0x100'000) - 50;
+        return static_cast<uint32_t>(data.temperature.raw) * (200.0f / 0x100'000) - 50;
     }
 
     [[nodiscard]] constexpr float humidity() const {
-        const auto masked = static_cast<uint32_t>(data.humidity.raw) >> 12;
-        return static_cast<float>(masked) * (100.0f / 0x100'000);
+        return static_cast<uint32_t>(data.humidity_raw) * (100.0f / 0x100'000);
     }
 };
 #pragma pack(pop)
@@ -69,7 +63,7 @@ struct Measurements {
 static_assert(sizeof(Measurements) == sizeof(uint8_t) * 6);
 static_assert(sizeof(Measurements::data) == sizeof(uint8_t) * 5);
 static_assert(__builtin_offsetof(Measurements, data.temperature.raw) == 2);
-static_assert(__builtin_offsetof(Measurements, data.humidity.raw) == 1);
+static_assert(__builtin_offsetof(Measurements, data.humidity_raw) == 1);
 
 }  // namespace ahtx0
 
