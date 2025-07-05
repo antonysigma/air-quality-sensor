@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ScioSense_ENS160.h"
+#include <Wire.h>
+
 #include "callbacks.hpp"
 #include "core.hpp"
 #include "serial.hpp"
@@ -11,14 +12,14 @@ struct I2CPort {
     constexpr static auto setup_i2c = flow::action("setup_i2c"_sc, []() { Wire.begin(); });
 
     template <class Message>
-    constexpr static void send(const uint8_t i2c_addr, const Message message) {
+    constexpr static uint8_t send(const uint8_t i2c_addr, const Message message) {
         Wire.beginTransmission(i2c_addr);
         if constexpr (sizeof(Message) == 1) {
             Wire.write(*reinterpret_cast<const uint8_t*>(&message));
         } else {
             Wire.write(reinterpret_cast<const uint8_t*>(&message), sizeof(Message));
         }
-        Wire.endTransmission();
+        return Wire.endTransmission();
     }
 
     template <class Message>

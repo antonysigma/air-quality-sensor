@@ -26,8 +26,8 @@ using namespace components;
 
 using Heartbeat = Blink<13>;
 using TS = TemperatureSensor<Heartbeat, I2CPort>;
-using GS = GasSensor<Heartbeat>;
-using SevenSegDisplay = ::components::seven_seg_display::Impl<I2CPort>;
+using GS = GasSensor<Heartbeat, I2CPort>;
+using SevenSegDisplay = seven_seg_display::Impl<I2CPort>;
 using RollingDisplay = rolling_display::Impl<SevenSegDisplay>;
 
 struct Project {

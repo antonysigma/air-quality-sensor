@@ -1,37 +1,44 @@
 #pragma once
 
-#include "ScioSense_ENS160.h"
 #include "callbacks.hpp"
 #include "core.hpp"
+#include "data-models/ens160_commands.hpp"
 #include "data-models/environment.hpp"
 #include "serial.hpp"
 
 namespace components {
 
-template <class Indicator, uint8_t i2c_addr = ENS160_I2CADDR_1>
+template <class Indicator, class I2CPort, uint8_t i2c_addr = 0x53>
 struct GasSensor {
-    // TODO(antony): Handroll our own ENS160 library.
-    static inline ScioSense_ENS160 sensor{i2c_addr};
     static inline bool has_sensor{false};
+    static inline ens160_commands::AQIPredictions cached_measurements{};
 
-    static bool set(const data_models::EnvironmentData data) {
-        return sensor.set_envdata(data.temperature, data.humidity);
+    static constexpr void set(const data_models::EnvironmentData data) {
+        using ens160_commands::SetEnvData;
+        I2CPort::send(i2c_addr, SetEnvData{data.temperature, data.humidity});
     }
 
     constexpr static auto ping_gas_sensor = flow::action("ping_gas_sensor"_sc, []() {
-        has_sensor = sensor.setMode(ENS160_OPMODE_IDLE);
+        using namespace ens160_commands;
+        using M = SetMode;
+        has_sensor = I2CPort::send(i2c_addr, SetMode{M::IDLE}) == 0;
         if (!has_sensor) {
             Indicator::setMode(Indicator::FAST);
             return;
         }
-        sensor.setMode(ENS160_OPMODE_STD);
+        I2CPort::send(i2c_addr, SetMode{M::STANDARD});
     });
 
-    static data_models::AirQuality read() {
-        sensor.measure(false);
-        sensor.measureRaw(false);
+    static constexpr data_models::AirQuality read() {
+        using namespace ens160_commands;
+        I2CPort::send(i2c_addr, GetStatus{});
+        const auto status = I2CPort::template read<Status>(i2c_addr);
+        if (status.isNewData()) {
+            I2CPort::send(i2c_addr, ReadAQIPrediction{});
+            cached_measurements = I2CPort::template read<AQIPredictions>(i2c_addr);
+        }
 
-        return {sensor.getAQI(), sensor.getTVOC(), sensor.geteCO2()};
+        return cached_measurements;
     }
 
     constexpr static auto config = cib::config(                                       //

@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+#include "data-models/ens160_commands.hpp"
+
 namespace data_models {
 
 struct EnvironmentData {
@@ -8,11 +10,7 @@ struct EnvironmentData {
     float humidity{};
 };
 
-struct AirQuality {
-    uint8_t aqi{};
-    uint16_t tvoc{};
-    uint16_t eco2{};
-};
+using AirQuality = ens160_commands::AQIPredictions;
 
 }  // namespace data_models
 
