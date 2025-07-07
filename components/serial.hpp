@@ -3,6 +3,7 @@
 #include "callbacks.hpp"
 #include "core.hpp"
 #include "data-models/environment.hpp"
+#include "utils/pgm_string.hpp"
 
 namespace components {
 
@@ -15,27 +16,33 @@ struct SerialPort {
         }
     });
 
+    static constexpr void print(const utils::PGMStringHelper message) {
+        for (const char* p = message.begin(); p != message.end(); ++p) {
+            Serial.write(pgm_read_byte(p));
+        }
+    }
+
     static void print(const data_models::AirQuality aq) {
-        Serial.print(F("AQI: "));
+        print(PSTR2("AQI: "));
         Serial.print(aq.aqi);
-        Serial.print(F("\tTVOC: "));
+        print(PSTR2("\tTVOC: "));
         Serial.print(aq.tvoc);
-        Serial.print(F("ppb\teCO2: "));
+        print(PSTR2("ppb\teCO2: "));
         Serial.print(aq.eco2);
-        Serial.print(F("ppm\n"));
+        print(PSTR2("ppm\n"));
     }
 
     static void print(const data_models::EnvironmentData env) {
-        constexpr auto print = [&](const float v) {
+        constexpr auto printFloat = [&](const float v) {  // NOLINT(readability-identifier-naming)
             Serial.print(static_cast<uint8_t>(v));
             Serial.write('.');
             Serial.print(static_cast<uint8_t>(v * 10) % 10);
         };
-        Serial.print(F("Temperature: "));
-        print(env.temperature);
-        Serial.print(F("C\tRH: "));
-        print(env.humidity);
-        Serial.print(F("%\n"));
+        print(PSTR2("Temperature: "));
+        printFloat(env.temperature);
+        print(PSTR2("C\tRH: "));
+        printFloat(env.humidity);
+        print(PSTR2("%\n"));
     }
 
     constexpr static auto config = cib::config(cib::extend<RuntimeInit>(

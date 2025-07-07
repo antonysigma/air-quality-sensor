@@ -1,5 +1,6 @@
 #pragma once
 #include "core.hpp"
+#include "utils/pgm_string.hpp"
 
 namespace controllers {
 
@@ -15,7 +16,7 @@ struct TheMainApp {
         prev_ms = current_ms;
 
         if (!GasSensor::has_sensor) {
-            Serial.print(F("ENS160 not available\n"));
+            SerialPort::print(PSTR2("ENS160 not available\n"));
             return;
         }
 
@@ -34,7 +35,7 @@ struct TheMainApp {
         prev_ms = current_ms;
 
         if (!TemperatureSensor::has_sensor) {
-            Serial.print(F("AHTX0 not available\n"));
+            SerialPort::print(PSTR2("AHTX0 not available\n"));
             return;
         }
 
