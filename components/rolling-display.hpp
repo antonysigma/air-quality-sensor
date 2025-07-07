@@ -92,7 +92,7 @@ struct Impl {
 
     constexpr static auto config = cib::config(  //
         cib::extend<MainLoop>([](const uint32_t current_ms) {
-            using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::branch_stm>;
+            using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
 
             static boost::sml::sm<rolling_display::internal::StateMachine<Display>, dispatch_t>
                 state_machine{air_quality, env};
