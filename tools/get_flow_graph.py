@@ -17,7 +17,9 @@ action = namespace* action_name
 action_name = snake_case
 namespace = snake_case "::"
 
-cib_config_opening_bracket = ws ("static constexpr" / "constexpr static") " auto config" ws "=" ws "cib::config(" ws
+cib_config_opening_bracket = ws ("static constexpr" / "constexpr static")
+" auto config" ws "=" ws "cib::config(" ws
+
 opening_bracket ="cib::extend<RuntimeInit>(" ws
 closing_bracket = ws ")"
 
