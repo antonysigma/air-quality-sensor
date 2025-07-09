@@ -79,12 +79,16 @@ struct StateMachine {
     }
 };
 
+using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
 }  // namespace internal
 
 template <class Display>
 struct Impl {
     static inline data_models::AirQuality air_quality{};
     static inline data_models::EnvironmentData env{};
+    static inline boost::sml::sm<rolling_display::internal::StateMachine<Display>,
+                                 internal::dispatch_t>
+        state_machine{air_quality, env};
 
     static constexpr void update(const data_models::AirQuality aq) { air_quality = aq; }
 
@@ -92,11 +96,6 @@ struct Impl {
 
     constexpr static auto config = cib::config(  //
         cib::extend<MainLoop>([](const uint32_t current_ms) {
-            using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
-
-            static boost::sml::sm<rolling_display::internal::StateMachine<Display>, dispatch_t>
-                state_machine{air_quality, env};
-
             state_machine.process_event(data_models::TimeMs{current_ms});
         }));
 };
