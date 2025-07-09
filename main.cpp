@@ -25,6 +25,7 @@ struct RegisteredInterfaces {
 using namespace components;
 
 using Heartbeat = Blink<13>;
+using I2CPort = i2c_port::Impl;
 using TS = TemperatureSensor<Heartbeat, I2CPort>;
 using GS = GasSensor<Heartbeat, I2CPort>;
 using SevenSegDisplay = seven_seg_display::Impl<I2CPort>;

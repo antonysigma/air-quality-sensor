@@ -4,6 +4,7 @@
 #include "core.hpp"
 #include "data-models/ens160_commands.hpp"
 #include "data-models/environment.hpp"
+#include "data-models/i2c_types.hpp"
 #include "serial.hpp"
 
 namespace components {
@@ -20,8 +21,10 @@ struct GasSensor {
 
     constexpr static auto ping_gas_sensor = flow::action("ping_gas_sensor"_sc, []() {
         using namespace ens160_commands;
+        using namespace i2c_types;
+
         using M = SetMode;
-        has_sensor = I2CPort::send(i2c_addr, SetMode{M::IDLE}) == 0;
+        has_sensor = I2CPort::send(i2c_addr, SetMode{M::IDLE}) == DATA_TRANSMITTED_ACK;
         if (!has_sensor) {
             Indicator::setMode(Indicator::FAST);
             return;
