@@ -69,6 +69,10 @@ union UcsrCRegister {
 static_assert(sizeof(UcsrCRegister) == 1);
 
 auto& ucsra{*reinterpret_cast<volatile UcsrARegister*>(0xC0)};
+
+template <typename T>
+concept Integral = std::is_integral_v<T>;
+
 }  // namespace serial_port
 
 struct SerialPort {
@@ -115,22 +119,27 @@ struct SerialPort {
         }
     }
 
-    template <typename T>
+    template <serial_port::Integral T>
     static constexpr void print(T v) {
-        static_assert(std::is_integral_v<T> && sizeof(T) <= sizeof(uint16_t));
-        if (v > 9999) {
-            print(PSTR2("OvEr"));
-            return;
-        }
-
+        static_assert(sizeof(T) <= sizeof(uint32_t));
         if (v < 0) {
-            print(PSTR2(" NeG"));
-            return;
+            write('-');
+            v = -v;
         }
 
-        std::array<char, 4> digits{' ', ' ', ' ', ' '};
-        for (auto iter = digits.rbegin(); v > 0 && iter != digits.rend(); ++iter, v /= 10) {
-            *iter = '0' + (v % 10);
+        constexpr uint8_t digit_count{[]() {
+            switch (sizeof(T)) {
+                case sizeof(uint8_t):
+                    return 3;
+                case sizeof(uint16_t):
+                    return 5;
+                default:
+                    return 10;
+            }
+        }()};
+        std::array<char, digit_count> digits;
+        for (auto iter = digits.rbegin(); iter != digits.rend(); ++iter, v /= 10) {
+            *iter = (v > 0) ? '0' + (v % 10) : ' ';
         }
 
         for (const auto& d : digits) {
