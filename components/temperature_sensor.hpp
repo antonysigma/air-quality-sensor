@@ -50,9 +50,10 @@ struct TemperatureSensor {
             }
         });
 
-    constexpr static auto config = cib::config(                                               //
-        cib::extend<RuntimeInit>(                                                             //
-            core::enable_interrupt >> ping_temperature_sensor >> SerialPort::wait_for_serial  //
+    constexpr static auto config = cib::config(  //
+        cib::extend<RuntimeInit>(                //
+            core::enable_interrupt >> ping_temperature_sensor >>
+            serial_port::Impl::wait_for_serial  //
             ));
 };
 }  // namespace components

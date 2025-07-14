@@ -9,6 +9,7 @@ namespace components {
 
 namespace serial_port {
 
+namespace internal {
 template <units::KiloHertz rate>
 constexpr uint16_t
 baudrateRegisterValue() {
@@ -70,15 +71,15 @@ static_assert(sizeof(UcsrCRegister) == 1);
 
 auto& ucsra{*reinterpret_cast<volatile UcsrARegister*>(0xC0)};
 
+}  // namespace internal
+
 template <typename T>
 concept Integral = std::is_integral_v<T>;
 
-}  // namespace serial_port
-
-struct SerialPort {
+struct Impl {
     constexpr static auto setup_serial = flow::action("setup_serial"_sc, []() {
-        using serial_port::UcsrBRegister;
-        using serial_port::UcsrCRegister;
+        using serial_port::internal::UcsrBRegister;
+        using serial_port::internal::UcsrCRegister;
         // auto& ucsrc{*reinterpret_cast<volatile uint8_t*>(0xC2)};
         // ucsrc = UcsrCRegister{.fields={.ucpol=1, .ucsz=0b11, .usbs=1, .upm=0b00,
         // .umsel=0b01}}.buffer;
@@ -101,7 +102,7 @@ struct SerialPort {
     });
 
     static void wait() {
-        using serial_port::ucsra;
+        using serial_port::internal::ucsra;
         while (!ucsra.udre) {
         }
     }
@@ -176,4 +177,5 @@ struct SerialPort {
     constexpr static auto config = cib::config(cib::extend<RuntimeInit>(
         core::system_clk_init >> setup_serial >> core::enable_interrupt >> wait_for_serial));
 };
+}  // namespace serial_port
 }  // namespace components

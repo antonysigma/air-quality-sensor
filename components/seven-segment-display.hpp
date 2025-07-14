@@ -238,7 +238,7 @@ struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(                //
             core::enable_interrupt >> init_7seg_display >> print_init_banner >>
-            SerialPort::wait_for_serial  //
+            serial_port::Impl::wait_for_serial  //
             ));
 };
 }  // namespace seven_seg_display

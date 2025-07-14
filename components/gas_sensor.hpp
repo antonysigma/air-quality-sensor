@@ -1,11 +1,11 @@
 #pragma once
 
 #include "callbacks.hpp"
+#include "components/serial.hpp"
 #include "core.hpp"
 #include "data-models/ens160_commands.hpp"
 #include "data-models/environment.hpp"
 #include "data-models/i2c_types.hpp"
-#include "serial.hpp"
 
 namespace components {
 
@@ -44,9 +44,9 @@ struct GasSensor {
         return cached_measurements;
     }
 
-    constexpr static auto config = cib::config(                                       //
-        cib::extend<RuntimeInit>(                                                     //
-            core::enable_interrupt >> ping_gas_sensor >> SerialPort::wait_for_serial  //
+    constexpr static auto config = cib::config(                                              //
+        cib::extend<RuntimeInit>(                                                            //
+            core::enable_interrupt >> ping_gas_sensor >> serial_port::Impl::wait_for_serial  //
             ));
 };
 }  // namespace components

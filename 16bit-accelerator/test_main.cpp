@@ -3,7 +3,8 @@
 #include "components/serial.hpp"
 #include "dsu_funcs2.hpp"
 
-#define SERIAL_PORT_IMPL ::components::SerialPort
+using SerialPort = ::components::serial_port::Impl;
+#define SERIAL_PORT_IMPL SerialPort
 #include "mcu_tests.hpp"
 
 namespace {
