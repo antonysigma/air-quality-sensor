@@ -2,6 +2,7 @@
 #include <boost/sml.hpp>
 #include <cmath>
 
+//
 #include "callbacks.hpp"
 #include "components/blink.hpp"
 #include "components/core.hpp"

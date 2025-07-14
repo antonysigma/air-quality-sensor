@@ -4,6 +4,7 @@
 
 #include "callbacks.hpp"
 #include "core.hpp"
+#include "data-models/display-commands.hpp"
 #include "data-models/environment.hpp"
 #include "data-models/timing.hpp"
 
@@ -33,7 +34,7 @@ struct StateMachine {
             Display::println("tVoC"sv);
         };
 
-        constexpr auto print_tvoc_value = [](const data_models::AirQuality& aq) {
+        constexpr auto print_tvoc_value = [](const ens160_commands::AQIPredictions& aq) {
             Display::print(display_commands::TVoc{aq});
         };
 
@@ -84,13 +85,13 @@ using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
 
 template <class Display>
 struct Impl {
-    static inline data_models::AirQuality air_quality{};
+    static inline ens160_commands::AQIPredictions air_quality{};
     static inline data_models::EnvironmentData env{};
     static inline boost::sml::sm<rolling_display::internal::StateMachine<Display>,
                                  internal::dispatch_t>
         state_machine{air_quality, env};
 
-    static constexpr void update(const data_models::AirQuality aq) { air_quality = aq; }
+    static constexpr void update(const ens160_commands::AQIPredictions aq) { air_quality = aq; }
 
     static constexpr void update(const data_models::EnvironmentData e) { env = e; }
 

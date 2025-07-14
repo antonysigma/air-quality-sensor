@@ -152,7 +152,7 @@ struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
         return write_buffer;
     }
 
-    static constexpr WriteBuffer make(const float value, const bool flush_right) {
+    static constexpr WriteBuffer make(const utils::Rational<> value, const bool flush_right) {
         WriteBuffer write_buffer{};
         write_buffer.resize(5);
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "environment.hpp"
 #include "utils/big_endian.hpp"
 
 namespace commands {
@@ -50,12 +51,22 @@ struct Measurements {
         be::UInt32<20, 12> humidity_raw{};
     } data{};
 
-    [[nodiscard]] constexpr float temperature() const {
-        return static_cast<uint32_t>(data.temperature.raw) * (200.0f / 0x100'000) - 50;
+    [[nodiscard]] constexpr utils::Rational<> temperature() const {
+        using R = utils::Rational<>;
+        const auto decoded = static_cast<uint32_t>(data.temperature.raw);
+        // const auto celcius = decoded * (200.0f / 100'000L) - 50;
+        return R{decoded, 0x100'000UL} * 200 + (-50UL);
     }
 
-    [[nodiscard]] constexpr float humidity() const {
-        return static_cast<uint32_t>(data.humidity_raw) * (100.0f / 0x100'000);
+    [[nodiscard]] constexpr utils::Rational<> humidity() const {
+        using R = utils::Rational<>;
+        const auto decoded = static_cast<uint32_t>(data.humidity_raw);
+        // const auto percentage = decoded * (100.0f / 0x100'000);
+        return R{decoded, 0x100'000UL} * 100;
+    }
+
+    [[nodiscard]] constexpr explicit operator data_models::EnvironmentData() const {
+        return {.temperature = temperature(), .humidity = humidity()};
     }
 };
 #pragma pack(pop)

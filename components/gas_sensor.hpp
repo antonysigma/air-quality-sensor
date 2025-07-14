@@ -16,7 +16,7 @@ struct GasSensor {
 
     static constexpr void set(const data_models::EnvironmentData data) {
         using ens160_commands::SetEnvData;
-        I2CPort::send(i2c_addr, SetEnvData{data.temperature, data.humidity});
+        I2CPort::send(i2c_addr, SetEnvData{data});
     }
 
     constexpr static auto ping_gas_sensor = flow::action("ping_gas_sensor"_sc, []() {
@@ -32,7 +32,7 @@ struct GasSensor {
         I2CPort::send(i2c_addr, SetMode{M::STANDARD});
     });
 
-    static constexpr data_models::AirQuality read() {
+    static constexpr ens160_commands::AQIPredictions read() {
         using namespace ens160_commands;
         I2CPort::send(i2c_addr, GetStatus{});
         const auto status = I2CPort::template read<Status>(i2c_addr);

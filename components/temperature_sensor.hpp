@@ -21,7 +21,7 @@ struct TemperatureSensor {
         }
 
         const auto measurements = I2CPort::template read<ahtx0::Measurements>(i2c_addr);
-        return {measurements.temperature(), measurements.humidity()};
+        return static_cast<data_models::EnvironmentData>(measurements);
     }
 
     constexpr static void wait() {

@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include "environment.hpp"
 
 namespace ens160_commands {
 
@@ -11,14 +11,16 @@ struct SetMode {
     constexpr explicit SetMode(uint8_t m) : mode{m} {}
 };
 
+using R = utils::Rational<>;
+
 struct SetEnvData {
     uint8_t cmd{0x13};
     uint16_t temperature{};
     uint16_t humidity{};
 
-    constexpr explicit SetEnvData(float t, float h)
-        : temperature{static_cast<uint16_t>((t + 273.15f) + 64.0f)},
-          humidity{static_cast<uint16_t>(h * 512.0f)} {}
+    constexpr explicit SetEnvData(data_models::EnvironmentData e)
+        : temperature{static_cast<uint16_t>((e.temperature + R{27315, 100}) + 64UL)},
+          humidity{static_cast<uint16_t>(e.humidity * 512)} {}
 };
 
 struct GetStatus {

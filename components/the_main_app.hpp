@@ -22,7 +22,16 @@ struct TheMainApp {
 
         const auto measurements = GasSensor::read();
         Display::update(measurements);
-        SerialPort::print(measurements);
+        constexpr auto print = [](const ens160_commands::AQIPredictions aq) {
+            SerialPort::print(PSTR2("AQI: "));
+            SerialPort::print(aq.aqi);
+            SerialPort::print(PSTR2("\tTVOC: "));
+            SerialPort::print(aq.tvoc);
+            SerialPort::print(PSTR2("ppb\teCO2: "));
+            SerialPort::print(aq.eco2);
+            SerialPort::print(PSTR2("ppm\n"));
+        };
+        print(measurements);
     };
 
     constexpr static auto read_temperature = [](const uint32_t current_ms) {
@@ -42,7 +51,24 @@ struct TheMainApp {
         const auto data = TemperatureSensor::read();
         GasSensor::set(data);
         Display::update(data);
-        SerialPort::print(data);
+
+        constexpr auto printFloat =
+            [&](const utils::Rational<> v) {  // NOLINT(readability-identifier-naming)
+                const auto truncated = static_cast<uint16_t>(v * 10);
+                SerialPort::print(truncated / 10);
+                SerialPort::write('.');
+                SerialPort::write('0' + (truncated % 10));
+            };
+
+        constexpr auto print = [=](const data_models::EnvironmentData env) {
+            SerialPort::print(PSTR2("Temperature: "));
+            printFloat(env.temperature);
+            SerialPort::print(PSTR2("C\tRH: "));
+            printFloat(env.humidity);
+            SerialPort::print(PSTR2("%\n"));
+        };
+
+        print(data);
     };
 
     constexpr static auto config = cib::config(   //
