@@ -32,15 +32,13 @@ constexpr cib::nexus<Project> nexus{};
 
 ISR(TIMER0_COMPA_vect) { nexus.service<OnTimer0Interrupt>(); }
 
-#define unlikely(expr) __builtin_expect(!!(expr), 0)
-
 TEST_CASE(UInt32Mul) {
     using dsu::xmuluu;
-    REQUIRE_EQ(xmuluu(3, 5), 15);
+    REQUIRE_EQ(xmuluu(3, 5), 15UL);
 
     for (uint16_t x = 0; x < 512; x++) {
         for (uint16_t y = 0; y < 512; y++) {
-            if (unlikely(xmuluu(x, y) != static_cast<uint32_t>(x) * y)) {
+            if (xmuluu(x, y) != static_cast<uint32_t>(x) * y) [[unlikely]] {
                 REQUIRE_EQ(xmuluu(x, y), static_cast<uint32_t>(x) * y);
                 return;
             }
@@ -53,7 +51,7 @@ TEST_CASE(Int32Mul) {
 
     for (int16_t x = -50; x < 50; x++) {
         for (int16_t y = -50; y < 50; y++) {
-            if (unlikely(xmulss(x, y) != static_cast<int32_t>(x) * y)) {
+            if (xmulss(x, y) != static_cast<int32_t>(x) * y) [[unlikely]] {
                 REQUIRE_EQ(xmulss(x, y), static_cast<int32_t>(x) * y);
                 return;
             }
@@ -65,7 +63,7 @@ TEST_CASE(Int32_UInt32Mul) {
     using dsu::xmulsu;
     for (int16_t x = -50; x < 50; x++) {
         for (uint16_t y = 0; y < 100; y++) {
-            if (unlikely(xmulsu(x, y) != static_cast<int32_t>(x) * y)) {
+            if (xmulsu(x, y) != static_cast<int32_t>(x) * y) [[unlikely]] {
                 REQUIRE_EQ(xmulsu(x, y), static_cast<int32_t>(x) * y);
                 return;
             }
@@ -77,7 +75,7 @@ TEST_CASE(Mulsi3Tests) {
     using dsu::mulsi3;
     for (uint32_t x = 10'000; x < 10'512; x++) {
         for (uint32_t y = 10'000; y < 10'512; y++) {
-            if (unlikely(mulsi3(x, y) != static_cast<int32_t>(x) * y)) {
+            if (mulsi3(x, y) != static_cast<int32_t>(x) * y) [[unlikely]] {
                 REQUIRE_EQ(mulsi3(x, y), static_cast<int32_t>(x) * y);
                 return;
             }
@@ -88,12 +86,12 @@ TEST_CASE(Mulsi3Tests) {
 int
 main() {
     {
-        volatile uint8_t& DCSR{*reinterpret_cast<volatile uint8_t*>(0x20)};
-        DCSR = DCSR | (1 << 7);
+        volatile uint8_t& dcsr{*reinterpret_cast<volatile uint8_t*>(0x20)};
+        dcsr = dcsr | (1 << 7);
     }
     nexus.service<RuntimeInit>();
 
-    ::mcu_tests::run_all_tests<SerialPort>();
+    ::mcu_tests::runAllTests<SerialPort>();
 
     for (;;) {
     }

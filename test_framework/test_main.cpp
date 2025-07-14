@@ -44,7 +44,7 @@ int
 main() {
     nexus.service<RuntimeInit>();
 
-    ::mcu_tests::run_all_tests<SerialPort>();
+    ::mcu_tests::runAllTests<SerialPort>();
 
     for (;;) {
     }

@@ -1,17 +1,21 @@
 #pragma once
+#include <cstdint>
 #include <string_view>
+
+#include "utils/clamp.hpp"
 
 namespace utils {
 
 struct PGMStringHelper : std::string_view {};
 }  // namespace utils
 
-#define PSTR2(s)                                    \
-    utils::PGMStringHelper {                        \
-        []() {                                      \
-            static const PROGMEM char message[]{s}; \
-            return std::string_view{message};       \
-        }()                                         \
+#define PSTR2(s)                                                                          \
+    utils::PGMStringHelper {                                                              \
+        []() {                                                                            \
+            static const PROGMEM char message[]{s};                                       \
+            const size_t length = utils::Max(static_cast<int32_t>(std::size(s)) - 1, 0L); \
+            return std::string_view{&(message[0]), length};                               \
+        }()                                                                               \
     }
 
 // end define PSTR2

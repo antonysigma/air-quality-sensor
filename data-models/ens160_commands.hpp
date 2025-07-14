@@ -5,14 +5,14 @@ namespace ens160_commands {
 
 #pragma pack(push, 1)
 struct SetMode {
-    const uint8_t cmd{0x10};
+    uint8_t cmd{0x10};
     enum mode_t : uint8_t { IDLE = 0x01, STANDARD = 0x02, LOW_POWER = 0x03 } mode;
 
     constexpr explicit SetMode(uint8_t m) : mode{m} {}
 };
 
 struct SetEnvData {
-    const uint8_t cmd{0x13};
+    uint8_t cmd{0x13};
     uint16_t temperature{};
     uint16_t humidity{};
 
@@ -22,7 +22,7 @@ struct SetEnvData {
 };
 
 struct GetStatus {
-    const uint8_t cmd{0x20};
+    uint8_t cmd{0x20};
 };
 
 struct Status {
@@ -32,7 +32,7 @@ struct Status {
 };
 
 struct ReadAQIPrediction {
-    const uint8_t cmd{0x21};
+    uint8_t cmd{0x21};
 };
 
 struct AQIPredictions {

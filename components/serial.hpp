@@ -69,14 +69,14 @@ union UcsrCRegister {
 };
 static_assert(sizeof(UcsrCRegister) == 1);
 
-auto& ucsra{*reinterpret_cast<volatile UcsrARegister*>(0xC0)};
-
 }  // namespace internal
 
 template <typename T>
 concept Integral = std::is_integral_v<T>;
 
 struct Impl {
+    static inline auto& ucsra{*reinterpret_cast<volatile internal::UcsrARegister*>(0xC0)};
+
     constexpr static auto setup_serial = flow::action("setup_serial"_sc, []() {
         using serial_port::internal::UcsrBRegister;
         using serial_port::internal::UcsrCRegister;
@@ -102,7 +102,6 @@ struct Impl {
     });
 
     static void wait() {
-        using serial_port::internal::ucsra;
         while (!ucsra.udre) {
         }
     }
@@ -115,8 +114,8 @@ struct Impl {
     }
 
     static constexpr void print(const utils::PGMStringHelper message) {
-        for (const char* p = message.begin(); p != message.end(); ++p) {
-            write(pgm_read_byte(p));
+        for (const auto& m : message) {
+            write(pgm_read_byte(&m));
         }
     }
 
@@ -138,7 +137,7 @@ struct Impl {
                     return 10;
             }
         }()};
-        std::array<char, digit_count> digits;
+        std::array<char, digit_count> digits{};
         for (auto iter = digits.rbegin(); iter != digits.rend(); ++iter, v /= 10) {
             *iter = (v > 0) ? '0' + (v % 10) : ' ';
         }

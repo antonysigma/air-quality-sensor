@@ -21,4 +21,10 @@ constexpr T
 Min(const T a, const T b) {  // NOLINT(readability-identifier-naming)
     return a < b ? a : b;
 }
+
+template <typename T>
+constexpr T
+Max(const T a, const T b) {  // NOLINT(readability-identifier-naming)
+    return a > b ? a : b;
+}
 }  // namespace utils

@@ -19,6 +19,7 @@ readability-identifier-naming,
 -modernize-avoid-c-arrays,
 -hicpp-avoid-c-arrays,
 -hicpp-uppercase-literal-suffix,
+-hicpp-no-assembler,
 -bugprone-dynamic-static-initializers'
 
 UseColor: true

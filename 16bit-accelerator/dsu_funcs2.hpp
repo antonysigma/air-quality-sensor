@@ -45,7 +45,7 @@ template <typename T>
 concept Int16 = std::is_integral_v<T> && (sizeof(T) == sizeof(uint16_t));
 
 template <OpCode opcode, Int32 T, Int16 U, Int16 V>
-inline T
+[[nodiscard]] inline T
 offloadToCoProcessor(U x, V y) {
     T result;
     asm volatile(
@@ -71,7 +71,7 @@ offloadToCoProcessor(U x, V y) {
     return result;
 }
 
-inline uint32_t
+[[nodiscard]] inline uint32_t
 mulsi3(uint32_t x, uint32_t y) {
     int32_t result;
     asm volatile(

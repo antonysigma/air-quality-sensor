@@ -13,9 +13,9 @@ struct TestCase {
 struct TestRegistry {
     static constexpr uint16_t max_size = 5;
     static inline std::array<TestCase, max_size> test_case{};
+    static inline uint16_t size{0};
 
-    static void add_test(TestCase&& tc) {
-        static uint16_t size{0};
+    static void addTest(TestCase&& tc) {
         if (size >= max_size) {
             return;
         }
@@ -36,6 +36,11 @@ struct TapReporter {
         S::write('\n');
     }
 
+    TapReporter(const TapReporter&) = delete;
+    TapReporter& operator=(const TapReporter&) = delete;
+    TapReporter(TapReporter&&) = delete;
+    TapReporter& operator=(TapReporter&&) = delete;
+
     template <bool is_pass>
     static constexpr void print(const utils::PGMStringHelper condition) {
         if constexpr (is_pass) {
@@ -50,18 +55,14 @@ struct TapReporter {
         S::write('\n');
     }
 
-    static constexpr void pass(utils::PGMStringHelper condition) {
-        print<true>(std::move(condition));
-    }
+    static constexpr void pass(utils::PGMStringHelper condition) { print<true>(condition); }
 
-    static constexpr void fail(utils::PGMStringHelper condition) {
-        print<false>(std::move(condition));
-    }
+    static constexpr void fail(utils::PGMStringHelper condition) { print<false>(condition); }
 };
 
 template <class S>
 constexpr void
-run_all_tests() {
+runAllTests() {
     TapReporter<S> reporter{};
 
     // std::for_each(TestRegistry::test_case.begin(),
@@ -78,14 +79,29 @@ run_all_tests() {
     }
 }
 
+template <typename T>
+constexpr inline void
+requireEqImpl(T lhs, T rhs, const utils::PGMStringHelper line_info) {
+    if (lhs == rhs) {
+        TapReporter<SERIAL_PORT_IMPL>::pass(line_info);
+    } else {
+        SERIAL_PORT_IMPL::print(PSTR2("# "));
+        SERIAL_PORT_IMPL::print(lhs);
+        SERIAL_PORT_IMPL::print(PSTR2(" == "));
+        SERIAL_PORT_IMPL::print(rhs);
+        SERIAL_PORT_IMPL::write('\n');
+        TapReporter<SERIAL_PORT_IMPL>::fail(line_info);
+    }
+}
+
 }  // namespace mcu_tests
 
-#define TEST_CASE(name)                                                                        \
-    void name##_impl();                                                                        \
-    void name##_register() {                                                                   \
-        ::mcu_tests::TestRegistry::add_test(::mcu_tests::TestCase{name##_impl, PSTR2(#name)}); \
-    }                                                                                          \
-    const auto name##_registered = (name##_register(), true);                                  \
+#define TEST_CASE(name)                                                                       \
+    void name##_impl();                                                                       \
+    void name##_register() {                                                                  \
+        ::mcu_tests::TestRegistry::addTest(::mcu_tests::TestCase{name##_impl, PSTR2(#name)}); \
+    }                                                                                         \
+    const auto name##_registered = (name##_register(), true);                                 \
     void name##_impl()
 
 // end define TEST_CASE
@@ -97,26 +113,12 @@ run_all_tests() {
 #define REQUIRE(cond)                                                    \
     {                                                                    \
         const auto line_info = (PSTR2(LINE " " #cond));                  \
-        if (cond) {                                                      \
+        if (cond) [[likely]] {                                           \
             ::mcu_tests::TapReporter<SERIAL_PORT_IMPL>::pass(line_info); \
         } else {                                                         \
             ::mcu_tests::TapReporter<SERIAL_PORT_IMPL>::fail(line_info); \
         }                                                                \
     }
 
-#define REQUIRE_EQ(lhs, rhs)                                             \
-    {                                                                    \
-        const auto line_info = (PSTR2(LINE " " #lhs " == " #rhs));       \
-        const auto lhs_v = (lhs);                                        \
-        const auto rhs_v = (rhs);                                        \
-        if (lhs_v == rhs_v) {                                            \
-            ::mcu_tests::TapReporter<SERIAL_PORT_IMPL>::pass(line_info); \
-        } else {                                                         \
-            SERIAL_PORT_IMPL::print(PSTR2("# "));                        \
-            SERIAL_PORT_IMPL::print(lhs_v);                              \
-            SERIAL_PORT_IMPL::print(PSTR2(" == "));                      \
-            SERIAL_PORT_IMPL::print(rhs_v);                              \
-            SERIAL_PORT_IMPL::write('\n');                               \
-            ::mcu_tests::TapReporter<SERIAL_PORT_IMPL>::fail(line_info); \
-        }                                                                \
-    }
+#define REQUIRE_EQ(lhs, rhs) \
+    ::mcu_tests::requireEqImpl((lhs), (rhs), PSTR2(LINE " " #lhs " == " #rhs));
