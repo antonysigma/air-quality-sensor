@@ -72,8 +72,8 @@ offloadToCoProcessor(U x, V y) {
     return result;
 }
 
-[[nodiscard]] inline uint32_t
-mulsi3(uint32_t x, uint32_t y) {
+[[nodiscard]] inline int32_t
+mulsi3(int32_t x, int32_t y) {
     int32_t result;
     asm volatile(
         // First partial product: x_lo * y_hi

@@ -74,6 +74,11 @@ constexpr static auto system_clk_init = flow::action("system_clk_init"_sc, []() 
     CLKPR = clockPrescaler<system_freq>();
 });
 
+static constexpr auto dsu_init = flow::action("dsu_init"_sc, []() {
+    volatile uint8_t& dcsr{*reinterpret_cast<volatile uint8_t*>(0x20)};
+    dcsr = dcsr | (1 << 7);
+});
+
 static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
     constexpr auto prescaler = 64UL;
 
@@ -87,7 +92,8 @@ static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
 struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
-            disable_interrupt >> system_clk_init >> timer0_init >> enable_interrupt  //
+            disable_interrupt >> system_clk_init >> timer0_init >> enable_interrupt,  //
+            disable_interrupt >> dsu_init >> enable_interrupt                         //
             ),
         cib::extend<OnTimer0Interrupt>([]() { millis_value = millis_value + 1; })  //
     );

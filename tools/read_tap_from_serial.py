@@ -16,11 +16,12 @@ stop_pattern = re.compile(r"^1\.\.")
 def uploadFirmware(upload_command: List[str]) -> bytes:
     return subprocess.check_output(upload_command)
 
+
 def captureTAPFromSerial() -> None:
     with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=30) as ser:
         while True:
             line = ser.readline().decode("utf-8", errors="replace")
-            print(line)
+            print(line[:-1])
             if stop_pattern.match(line):
                 break
 
@@ -36,4 +37,4 @@ if __name__ == "__main__":
     captureTAPFromSerial()
 
     # Print the upload log
-    print('# ' + '\n# '.join(upload_log.decode('utf-8', errors='replace').splitlines()))
+    print("# " + "\n# ".join(upload_log.decode("utf-8", errors="replace").splitlines()))

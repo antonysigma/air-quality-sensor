@@ -82,7 +82,9 @@ runAllTests() {
 template <typename T>
 constexpr inline void
 requireEqImpl(T lhs, T rhs, const utils::PGMStringHelper line_info) {
-    if (lhs == rhs) {
+    static_assert(std::is_integral_v<T>);
+
+    if (lhs == rhs) [[likely]] {
         TapReporter<SERIAL_PORT_IMPL>::pass(line_info);
     } else {
         SERIAL_PORT_IMPL::print(PSTR2("# "));
