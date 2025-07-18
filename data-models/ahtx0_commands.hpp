@@ -9,9 +9,8 @@ namespace ahtx0 {
 #pragma pack(push, 1)
 struct SoftResetCmd {
     uint8_t cmd{0xBA};
-    uint8_t padding[2]{0, 0};
 };
-static_assert(sizeof(SoftResetCmd) == 3);
+static_assert(sizeof(SoftResetCmd) == 1);
 
 struct CalibrateCmd {
     uint8_t cmd{0xE1};
