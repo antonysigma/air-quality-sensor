@@ -1,13 +1,25 @@
 dsu_funcs_lib = static_library('dsu_funcs',
     sources: '__dsu_funcs.S',
     c_args: [
-        '-DENABLE_DSU_INTERNAL_FUNCS=0',
+        '-DENABLE_DSU_INTERNAL_FUNCS=1',
         '-ffunction-sections',
     ],
 )
 
+dsu_funcs2_lib = static_library('dsu_funcs2',
+    sources: 'dsu_funcs2.cpp',
+    cpp_args: [
+        '-UDSU_OVERRIDE_GCC',
+        '-fno-lto',
+    ],
+    dependencies: [
+        avr_stdcpp_dep,
+    ],
+)
+
+
 dsu_funcs_dep = declare_dependency(
-    link_with: dsu_funcs_lib,
+    link_with: dsu_funcs2_lib,
     include_directories: '.',
 )
 
@@ -35,8 +47,6 @@ dsu_tests_exe = executable('dsu_tests',
         cib_dep,
         # avr-ar does not support fat object files, why?
         arduinocore_proj.get_variable('arduinocore_dep'),
-        arduinocore_proj.get_variable('arduinocore_wire_dep'),
-        dsu_funcs_dep,
         mcu_tests_dep,
     ],
 )

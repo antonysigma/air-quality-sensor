@@ -73,10 +73,11 @@ TEST_CASE(Int32_UInt32Mul) {
 
 TEST_CASE(Mulsi3Tests) {
     using dsu::mulsi3;
-    for (uint32_t x = 10'000; x < 10'512; x++) {
-        for (uint32_t y = 10'000; y < 10'512; y++) {
-            if (mulsi3(x, y) != static_cast<int32_t>(x) * y) [[unlikely]] {
-                REQUIRE_EQ(mulsi3(x, y), static_cast<int32_t>(x) * y);
+    constexpr uint32_t offset{1'000'000UL};
+    for (uint32_t x = offset; x < offset + 512; x++) {
+        for (uint32_t y = offset; y < offset + 512; y++) {
+            if (mulsi3(x, y) != x * y) [[unlikely]] {
+                REQUIRE_EQ(mulsi3(x, y), x * y);
                 return;
             }
         }
