@@ -1,6 +1,6 @@
 #pragma once
+#include "../utils/big_endian.hpp"
 #include "environment.hpp"
-#include "utils/big_endian.hpp"
 
 namespace commands {
 

@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdint>
 
-#include "utils/clamp.hpp"
+#include "clamp.hpp"
 
 namespace utils {
 

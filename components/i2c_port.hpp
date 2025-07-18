@@ -12,7 +12,7 @@ namespace components {
 namespace i2c_port {
 
 struct Prescaler {
-    uint8_t raw;
+    uint8_t raw{};
     constexpr explicit Prescaler(uint8_t rate)
         : raw{[=]() -> uint8_t {
               // Table 21-8: TWI bit rate prescaler

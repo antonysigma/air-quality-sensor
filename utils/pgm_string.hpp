@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <string_view>
 
-#include "utils/clamp.hpp"
+#include "clamp.hpp"
 
 namespace utils {
 

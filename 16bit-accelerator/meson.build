@@ -40,8 +40,7 @@ dsu_tests_exe = executable('dsu_tests',
         '-fwhole-program',
     ],
     include_directories: [
-        boost_sml_inc,
-        '..',
+        common_inc,
     ],
     dependencies: [
         cib_dep,

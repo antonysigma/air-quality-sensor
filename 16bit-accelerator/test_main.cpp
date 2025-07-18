@@ -84,7 +84,7 @@ TEST_CASE(Int32Mul) {
         for (int32_t y = offset; y < offset + 512; y++) {
             const auto expected = x * y;
             if (mulsi3(x, y) != expected) [[unlikely]] {
-                std::array<char, 80> buffer;
+                std::array<char, 80> buffer{};
                 snprintf(buffer.data(), buffer.size(), "# %ld x %ld = %ld\n", x, y, expected);
                 for(const char& c : buffer) {
                     if(c == '\0') {

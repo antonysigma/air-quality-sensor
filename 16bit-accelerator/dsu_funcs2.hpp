@@ -73,8 +73,8 @@ offloadToCoProcessor(U x, V y) {
 }
 
 [[nodiscard]] inline int32_t
-mulsi3(int32_t x, int32_t y) {
-    int32_t result;
+mulsi3(int32_t x, int32_t y) {  // NOLINT(bugprone-easily-swappable-parameters)
+    int32_t result;             // NOLINT(cppcoreguidelines-init-variables)
     asm volatile(
         // First partial product: x_lo * y_hi
         R"""(out %[dsdx], %A[x]

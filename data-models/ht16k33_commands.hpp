@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <span>
 
-#include "utils/clamp.hpp"
+#include "../utils/clamp.hpp"
 
 namespace ht16k33_commands {
 #pragma pack(push, 1)
 struct Brightness {
     static constexpr uint8_t brightness_cmd{0xE0};
-    uint8_t value;
+    uint8_t value{};
 
     constexpr explicit Brightness(uint8_t b)
         : value(brightness_cmd | utils::Min(b, static_cast<uint8_t>(15))) {}
@@ -20,7 +20,7 @@ struct BlinkRate {
     static constexpr uint8_t blink_cmd{0x80};
     static constexpr uint8_t display_on{0x01};
 
-    uint8_t buffer;
+    uint8_t buffer{};
     constexpr explicit BlinkRate(uint8_t rate)
         : buffer(blink_cmd |  // NOLINT(hicpp-signed-bitwise)
                  display_on | (utils::Min(rate, static_cast<uint8_t>(2)) << 1)) {}

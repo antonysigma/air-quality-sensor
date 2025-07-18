@@ -20,7 +20,8 @@ struct TestRegistry {
             return;
         }
 
-        test_case[size++] = std::move(tc);
+        test_case[size++] =
+            std::move(tc);  // NOLINT(hicpp-move-const-arg,performance-move-const-arg)
     }
 };
 
@@ -79,20 +80,20 @@ runAllTests() {
     }
 }
 
-template <typename T>
+template <class SerialPort, typename T>
 constexpr inline void
 requireEqImpl(T lhs, T rhs, const utils::PGMStringHelper line_info) {
     static_assert(std::is_integral_v<T>);
 
     if (lhs == rhs) [[likely]] {
-        TapReporter<SERIAL_PORT_IMPL>::pass(line_info);
+        TapReporter<SerialPort>::pass(line_info);
     } else {
-        SERIAL_PORT_IMPL::print(PSTR2("# "));
-        SERIAL_PORT_IMPL::print(lhs);
-        SERIAL_PORT_IMPL::print(PSTR2(" == "));
-        SERIAL_PORT_IMPL::print(rhs);
-        SERIAL_PORT_IMPL::write('\n');
-        TapReporter<SERIAL_PORT_IMPL>::fail(line_info);
+        SerialPort::print(PSTR2("# "));
+        SerialPort::print(lhs);
+        SerialPort::print(PSTR2(" == "));
+        SerialPort::print(rhs);
+        SerialPort::write('\n');
+        TapReporter<SerialPort>::fail(line_info);
     }
 }
 
@@ -123,4 +124,4 @@ requireEqImpl(T lhs, T rhs, const utils::PGMStringHelper line_info) {
     }
 
 #define REQUIRE_EQ(lhs, rhs) \
-    ::mcu_tests::requireEqImpl((lhs), (rhs), PSTR2(LINE " " #lhs " == " #rhs));
+    ::mcu_tests::requireEqImpl<SERIAL_PORT_IMPL>((lhs), (rhs), PSTR2(LINE " " #lhs " == " #rhs));

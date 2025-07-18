@@ -28,13 +28,12 @@ test_runner_exe = executable('test_runner',
         '-fwhole-program',
     ],
     include_directories: [
-        '..',
+        common_inc,
     ],
     dependencies: [
         cib_dep,
         # avr-ar does not support fat object files, why?
         arduinocore_proj.get_variable('arduinocore_dep'),
-        arduinocore_proj.get_variable('arduinocore_wire_dep'),
     ],
 )
 

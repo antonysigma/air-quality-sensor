@@ -41,6 +41,7 @@ main_exe = executable('main',
     ],
     include_directories: [
         boost_sml_inc,
+        common_inc,
     ],
     dependencies: [
         cib_dep,

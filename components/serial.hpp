@@ -17,16 +17,16 @@ baudrateRegisterValue() {
 
 struct UcsrARegister {
     /** Multi-processor mode */
-    uint8_t mpme : 1;
+    uint8_t mpme : 1 = 0;
 
     /** double-speed mode */
-    uint8_t u2x : 1;
-    uint8_t pe : 1;
-    uint8_t dor : 1;
-    uint8_t fe : 1;
-    uint8_t udre : 1;
-    uint8_t txc : 1;
-    uint8_t rxc : 1;
+    uint8_t u2x : 1 = 0;
+    uint8_t pe : 1 = 0;
+    uint8_t dor : 1 = 0;
+    uint8_t fe : 1 = 0;
+    uint8_t udre : 1 = 0;
+    uint8_t txc : 1 = 0;
+    uint8_t rxc : 1 = 0;
 };
 
 union UcsrBRegister {

@@ -52,7 +52,7 @@ struct TheMainApp {
         GasSensor::set(data);
         Display::update(data);
 
-        constexpr auto printFloat =
+        constexpr auto print_float =
             [&](const utils::Rational<> v) {  // NOLINT(readability-identifier-naming)
                 const auto truncated = static_cast<uint16_t>(v * 10);
                 SerialPort::print(truncated / 10);
@@ -62,9 +62,9 @@ struct TheMainApp {
 
         constexpr auto print = [=](const data_models::EnvironmentData env) {
             SerialPort::print(PSTR2("Temperature: "));
-            printFloat(env.temperature);
+            print_float(env.temperature);
             SerialPort::print(PSTR2("C\tRH: "));
-            printFloat(env.humidity);
+            print_float(env.humidity);
             SerialPort::print(PSTR2("%\n"));
         };
 

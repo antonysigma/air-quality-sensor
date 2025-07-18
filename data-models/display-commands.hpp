@@ -1,7 +1,7 @@
 #pragma once
 
-#include "data-models/ens160_commands.hpp"
-#include "data-models/environment.hpp"
+#include "ens160_commands.hpp"
+#include "environment.hpp"
 
 namespace display_commands {
 using AirQuality = ens160_commands::AQIPredictions;
