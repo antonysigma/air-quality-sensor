@@ -38,6 +38,7 @@ main_exe = executable('main',
 
         # Trying to compensate for the lack of LTO.
         '-fwhole-program',
+        '-ffreestanding',
     ],
     include_directories: [
         boost_sml_inc,

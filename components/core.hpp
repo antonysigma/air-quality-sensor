@@ -63,10 +63,10 @@ static_assert(clockPrescaler<16e3_kHz>() == 0x01);
 static_assert(clockPrescaler<8e3_kHz>() == 0x02);
 static_assert(clockPrescaler<4e3_kHz>() == 0x03);
 
-static constexpr auto disable_interrupt = flow::action("disable_interrupt"_sc, []() { cli(); });
-static constexpr auto enable_interrupt = flow::action("enable_interrupt"_sc, []() { sei(); });
+static constexpr auto disable_interrupt = flow::action<"disable_interrupt">([]() { cli(); });
+static constexpr auto enable_interrupt = flow::action<"enable_interrupt">([]() { sei(); });
 
-constexpr static auto system_clk_init = flow::action("system_clk_init"_sc, []() {
+constexpr static auto system_clk_init = flow::action<"system_clk_init">([]() {
     // Enable clock prescaler pin change.
     CLKPR = 0x80;
 
@@ -74,12 +74,12 @@ constexpr static auto system_clk_init = flow::action("system_clk_init"_sc, []() 
     CLKPR = clockPrescaler<system_freq>();
 });
 
-static constexpr auto dsu_init = flow::action("dsu_init"_sc, []() {
+static constexpr auto dsu_init = flow::action<"dsu_init">([]() {
     volatile uint8_t& dcsr{*reinterpret_cast<volatile uint8_t*>(0x20)};
     dcsr = dcsr | (1 << 7);
 });
 
-static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
+static constexpr auto timer0_init = flow::action<"timer0_init">([]() {
     constexpr auto prescaler = 64UL;
 
     TCCR0A = TCCR0A | (1u << WGM01);                                        // Set the CTC mode
@@ -92,8 +92,8 @@ static constexpr auto timer0_init = flow::action("timer0_init"_sc, []() {
 struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
-            disable_interrupt >> system_clk_init >> timer0_init >> enable_interrupt,  //
-            disable_interrupt >> dsu_init >> enable_interrupt                         //
+            *disable_interrupt >> *system_clk_init >> *timer0_init >> *enable_interrupt,  //
+            disable_interrupt >> *dsu_init >> enable_interrupt                         //
             ),
         cib::extend<OnTimer0Interrupt>([]() { millis_value = millis_value + 1; })  //
     );

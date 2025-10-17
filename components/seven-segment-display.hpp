@@ -179,7 +179,7 @@ struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
 
 template <class I2CPort, uint8_t i2c_addr = 0x70>
 struct Impl {
-    constexpr static auto init_7seg_display = flow::action("init_7seg_display"_sc, []() {
+    constexpr static auto init_7seg_display = flow::action<"init_7seg_display">([]() {
         using namespace ht16k33_commands;
         I2CPort::send(i2c_addr, OscillatorOn{});
         I2CPort::send(i2c_addr, NoBlink{});
@@ -193,7 +193,7 @@ struct Impl {
         I2CPort::send(i2c_addr, WriteDisplay{write_buffer});
     }
 
-    constexpr static auto print_init_banner = flow::action("print_init_banner"_sc, []() {
+    constexpr static auto print_init_banner = flow::action<"print_init_banner">([]() {
         using namespace std::string_view_literals;
         println("Init"sv);
     });
@@ -237,7 +237,7 @@ struct Impl {
 
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(                //
-            core::enable_interrupt >> init_7seg_display >> print_init_banner >>
+            core::enable_interrupt >> *init_7seg_display >> *print_init_banner >>
             serial_port::Impl::wait_for_serial  //
             ));
 };

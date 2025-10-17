@@ -76,7 +76,7 @@ concept Integral = std::is_integral_v<T>;
 struct Impl {
     static inline auto& ucsra{*reinterpret_cast<volatile internal::UcsrARegister*>(0xC0)};
 
-    constexpr static auto setup_serial = flow::action("setup_serial"_sc, []() {
+    constexpr static auto setup_serial = flow::action<"setup_serial">([]() {
         using serial_port::internal::UcsrBRegister;
         using serial_port::internal::UcsrCRegister;
         // auto& ucsrc{*reinterpret_cast<volatile uint8_t*>(0xC2)};
@@ -105,7 +105,7 @@ struct Impl {
         }
     }
 
-    constexpr static auto wait_for_serial = flow::action("wait_for_serial"_sc, []() { wait(); });
+    constexpr static auto wait_for_serial = flow::action<"wait_for_serial">([]() { wait(); });
 
     static void write(const char c) {
         wait();
@@ -152,7 +152,7 @@ struct Impl {
     }
 
     constexpr static auto config = cib::config(cib::extend<RuntimeInit>(
-        core::system_clk_init >> setup_serial >> core::enable_interrupt >> wait_for_serial));
+        core::system_clk_init >> *setup_serial >> core::enable_interrupt >> *wait_for_serial));
 };
 }  // namespace serial_port
 }  // namespace components

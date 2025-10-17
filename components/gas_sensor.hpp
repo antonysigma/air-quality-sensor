@@ -19,7 +19,7 @@ struct GasSensor {
         I2CPort::send(i2c_addr, SetEnvData{data});
     }
 
-    constexpr static auto ping_gas_sensor = flow::action("ping_gas_sensor"_sc, []() {
+    constexpr static auto ping_gas_sensor = flow::action<"ping_gas_sensor">([]() {
         using namespace ens160_commands;
         using namespace i2c_types;
 
@@ -46,7 +46,7 @@ struct GasSensor {
 
     constexpr static auto config = cib::config(                                              //
         cib::extend<RuntimeInit>(                                                            //
-            core::enable_interrupt >> ping_gas_sensor >> serial_port::Impl::wait_for_serial  //
+            core::enable_interrupt >> *ping_gas_sensor >> serial_port::Impl::wait_for_serial  //
             ));
 };
 }  // namespace components
