@@ -32,7 +32,7 @@ struct TemperatureSensor {
     }
 
     constexpr static auto ping_temperature_sensor =
-        flow::action("ping_temperature_sensor"_sc, []() {
+        flow::action<"ping_temperature_sensor">([]() {
             namespace ahtx0 = commands::ahtx0;
             // Wait for device to power up.
             delay(20);
@@ -52,7 +52,7 @@ struct TemperatureSensor {
 
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(                //
-            core::enable_interrupt >> ping_temperature_sensor >>
+            core::enable_interrupt >> *ping_temperature_sensor >>
             serial_port::Impl::wait_for_serial  //
             ));
 };

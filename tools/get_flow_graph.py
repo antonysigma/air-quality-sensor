@@ -13,7 +13,7 @@ line_ignored = ~"[^\n]*\n"
 cib_extend_func =  opening_bracket pipeline_list closing_bracket
 pipeline_list = pipeline (delimiter pipeline)*
 pipeline = action (pipe action)+
-action = namespace* action_name
+action = "*"? namespace* action_name
 action_name = snake_case
 namespace = snake_case "::"
 

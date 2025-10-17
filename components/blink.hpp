@@ -16,10 +16,10 @@ struct Blink {
 
     static void setMode(const blink_interval_t m) { blink_interval = m; }
 
-    constexpr static auto init_led = flow::action("init_led"_sc, []() { pinMode(led_id, OUTPUT); });
+    constexpr static auto init_led = flow::action<"init_led">([]() { pinMode(led_id, OUTPUT); });
 
     constexpr static auto config = cib::config(
-        cib::extend<RuntimeInit>(core::disable_interrupt >> init_led >> core::enable_interrupt),
+        cib::extend<RuntimeInit>(core::disable_interrupt >> *init_led >> core::enable_interrupt),
         cib::extend<MainLoop>([](const uint32_t current_ms) {
             // TODO(antony): decouple GPIO component and the application.
 

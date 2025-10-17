@@ -1,0 +1,5 @@
+[wrap-git]
+directory = compile-time-init-build
+url = https://github.com/intel/compile-time-init-build.git
+revision = mesonbuild-no-fmtlib
+depth = 1

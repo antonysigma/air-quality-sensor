@@ -102,7 +102,7 @@ stop() {
 }
 
 struct Impl {
-    constexpr static auto setup_i2c = flow::action("setup_i2c"_sc, []() {
+    constexpr static auto setup_i2c = flow::action<"setup_i2c">([]() {
         constexpr auto prescaler = Prescaler{1};
         TWSR = prescaler.value();
         TWBR = computeI2CFrequency<prescaler, 100.0_kHz>();
@@ -147,7 +147,7 @@ struct Impl {
     }
 
     constexpr static auto config = cib::config(cib::extend<RuntimeInit>(  //
-        core::system_clk_init >> setup_i2c >> core::enable_interrupt      //
+        core::system_clk_init >> *setup_i2c >> core::enable_interrupt      //
         ));
 };
 }  // namespace i2c_port
