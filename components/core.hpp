@@ -19,7 +19,7 @@ Millis() {  // NOLINT(readability-identifier-naming)
 namespace core {
 
 template <uint16_t factor>
-constexpr uint8_t
+consteval uint8_t
 prescalerRegisterValue() {
     static_assert(factor == 8 || factor == 64 || factor == 256 || factor == 1024);
     switch (factor) {
@@ -37,7 +37,7 @@ prescalerRegisterValue() {
 }
 
 template <uint16_t prescaler_value, units::Microsecond<uint32_t> time_interval>
-constexpr uint8_t
+consteval uint8_t
 overflowRegisterValue() {
     static_assert(static_cast<uint64_t>(timer0.freq * time_interval) % prescaler_value == 0,
                   "Timer0 period must be a multiple of prescaler");
@@ -51,7 +51,7 @@ overflowRegisterValue() {
 static_assert(overflowRegisterValue<64, 1_ms>() == 0xF9);
 
 template <units::KiloHertz timer_freq>
-constexpr uint8_t
+consteval uint8_t
 clockPrescaler() {
     constexpr auto division = static_cast<uint32_t>(oscillator_freq / timer_freq);
 
