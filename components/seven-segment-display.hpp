@@ -16,7 +16,7 @@ namespace seven_seg_display {
 
 namespace internal {
 
-constexpr std::array<uint8_t, 96> seven_seg_fonttable{
+constexpr PROGMEM std::array<uint8_t, 96> seven_seg_fonttable{
     0b00000000,  // (space)
     0b10000110,  // !
     0b00100010,  // "
@@ -115,15 +115,15 @@ constexpr std::array<uint8_t, 96> seven_seg_fonttable{
     0b00000000,  // del
 };
 
-constexpr uint8_t
+uint8_t
 getFont(const char c) {
     const uint16_t index =
         utils::Min(static_cast<uint16_t>(c - ' '), seven_seg_fonttable.size() - 1);
-    return seven_seg_fonttable[index];  // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    return pgm_read_byte(seven_seg_fonttable.data() + index);  // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
 struct WriteBuffer : public utils::SmallVector<uint8_t, 5> {
-    constexpr void write(const char c) {
+    void write(const char c) {
         emplaceBack(getFont(c));
         // Skip the middle colon (:) LED
         if (size() == 2) {
