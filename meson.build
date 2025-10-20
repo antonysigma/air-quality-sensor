@@ -15,7 +15,7 @@ cib_dep = cib_proj.get_variable('cib_dep')
 arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')
 
-avr_objcopy_exe = find_program('/opt/avr-gcc/bin/avr-objcopy')
+avr_objcopy_exe = find_program(meson.get_cross_property('objcopy_exe'))
 avrdude_exe = cib_proj.get_variable('avrdude_exe')
 avrdude_conf = cib_proj.get_variable('avrdude_conf')
 
