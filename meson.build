@@ -15,7 +15,7 @@ cib_dep = cib_proj.get_variable('cib_dep')
 arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')
 
-avr_objcopy_exe = find_program(meson.get_cross_property('objcopy_exe'))
+avr_objcopy_exe = find_program(meson.get_cross_property('avr_toolchain_bin_path') / 'avr-objcopy')
 avrdude_exe = cib_proj.get_variable('avrdude_exe')
 avrdude_conf = cib_proj.get_variable('avrdude_conf')
 
@@ -39,6 +39,10 @@ main_exe = executable('main',
         # Trying to compensate for the lack of LTO.
         '-fwhole-program',
         '-ffreestanding',
+    ],
+    link_args: [
+        '-Wl,--gc-sections',
+        '-Wl,-e,main',
     ],
     include_directories: [
         boost_sml_inc,
