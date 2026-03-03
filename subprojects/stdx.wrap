@@ -1,10 +1,2 @@
-[wrap-git]
-directory = cpp-std-extensions
-url = https://github.com/intel/cpp-std-extensions.git
-revision = 4d468edbae3fe8a5c2c113e80411b3f92a73162d
-depth = 1
-patch_directory = stdx
-diff_files = stdx/relax-tuple-concepts.patch
-
-[provide]
-stdx = stdx_dep
+[wrap-redirect]
+filename = compile-time-init-build/subprojects/stdx.wrap
