@@ -23,6 +23,10 @@ subdir('tools')
 subdir('test_framework')
 subdir('16bit-accelerator')
 
+pdaqp_solver_dep = subproject('pdaqp-solver-cpp', default_options: [
+    'name=pid',
+]).get_variable('pdaqp_solver_dep')
+
 main_exe = executable('main',
     sources: [
         'main.cpp',
@@ -54,6 +58,7 @@ main_exe = executable('main',
         arduinocore_proj.get_variable('arduinocore_dep'),
         arduinocore_proj.get_variable('arduinocore_wire_dep'),
         dsu_funcs_dep,
+        pdaqp_solver_dep,
     ],
 )
 

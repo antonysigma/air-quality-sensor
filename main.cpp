@@ -13,6 +13,7 @@
 #include "components/seven-segment-display.hpp"
 #include "components/temperature_sensor.hpp"
 #include "components/the_main_app.hpp"
+#include "pdaqp-solver.h"
 
 namespace {
 struct RegisteredInterfaces {
@@ -57,10 +58,23 @@ int
 main() {
     nexus.service<RuntimeInit>();
 
-    for (;;) {
-        const auto current_ms = components::Millis();
-        nexus.service<MainLoop>(current_ms);
-    }
+    static_assert(sizeof(Parameter) % 2 == 0);
+    const uint16_t raw[sizeof(Parameter) / 2] PROGMEM {};
+    Parameter parameter{};
+
+    std::transform(raw, raw + sizeof(Parameter), reinterpret_cast<uint16_t*>(&parameter), [](const uint16_t& c) {
+        return pgm_read_u16(&c);
+    });
+    const auto solution = pdaqpSolver<true>(std::move(parameter));
+
+    const auto* bytes{reinterpret_cast<const char*>(&solution)};
+    std::for_each(bytes, bytes + sizeof(solution), [](const char& c) {
+        SerialPort::write(c);
+    });
+    //for (;;) {
+    //    const auto current_ms = components::Millis();
+    //    nexus.service<MainLoop>(current_ms);
+    //}
 
     return 0;
 }

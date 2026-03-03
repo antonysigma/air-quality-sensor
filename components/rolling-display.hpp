@@ -80,7 +80,7 @@ struct StateMachine {
     }
 };
 
-using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
+using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::switch_stm>;
 }  // namespace internal
 
 template <class Display>
