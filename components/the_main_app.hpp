@@ -14,10 +14,10 @@ struct TheMainApp {
         static units::Millisecond<uint16_t> prev_ms{};
 
         // Eliminate the 32-bit guard variable for non-zero static initialization.
-        static bool is_first_time{true};
-        if (is_first_time) {
+        static bool is_initialized{false};
+        if (!is_initialized) [[unlikely]] {
             prev_ms = current_ms - update_interval;
-            is_first_time = false;
+            is_initialized = true;
         }
 
         if (current_ms - prev_ms < update_interval) {
@@ -48,10 +48,10 @@ struct TheMainApp {
         static units::Millisecond<uint16_t> prev_ms{};
 
         // Eliminate the 32-bit guard variable for non-zero static initialization.
-        static bool is_first_time{true};
-        if (is_first_time) {
+        static bool is_initialized{false};
+        if (!is_initialized) [[unlikely]] {
             prev_ms = current_ms - update_interval;
-            is_first_time = false;
+            is_initialized = true;
         }
 
         if (current_ms - prev_ms < update_interval) {
