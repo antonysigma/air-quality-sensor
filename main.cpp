@@ -25,6 +25,7 @@ struct RegisteredInterfaces {
 
 using namespace components;
 
+// clang-format off
 using Heartbeat = Blink<13>;
 using SerialPort = serial_port::Impl;
 using I2CPort = i2c_port::Impl;
@@ -34,18 +35,20 @@ using SevenSegDisplay = seven_seg_display::Impl<I2CPort>;
 using RollingDisplay = rolling_display::Impl<SevenSegDisplay>;
 
 struct Project {
-    static constexpr auto config = cib::components<  //
-        RegisteredInterfaces,                        //
-        core::Impl,                                  //
-        SerialPort,                                  //
-        Heartbeat,                                   //
-        I2CPort,                                     //
-        TS,                                          //
-        GS,                                          //
-        SevenSegDisplay,                             //
-        RollingDisplay,                              //
-        controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>>;
+    static constexpr auto config = cib::components<
+        RegisteredInterfaces,
+        core::Impl,
+        SerialPort,
+        Heartbeat,
+        I2CPort,
+        TS,
+        GS,
+        SevenSegDisplay,
+        RollingDisplay,
+        controllers::TheMainApp<TS, GS, RollingDisplay, SerialPort>
+    >;
 };
+// clang-format on
 
 constexpr cib::nexus<Project> nexus{};
 
