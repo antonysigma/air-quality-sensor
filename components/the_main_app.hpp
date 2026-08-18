@@ -6,11 +6,12 @@ namespace controllers {
 
 template <class TemperatureSensor, class GasSensor, class Display, class SerialPort>
 struct TheMainApp {
+    static constexpr auto update_interval{30'000UL};
     constexpr static auto read_air_quality = [](const uint32_t current_ms) {
         using components::Millis;
 
-        static auto prev_ms = current_ms + 100'000UL;
-        if (current_ms - prev_ms < 30'000UL) {
+        static uint32_t prev_ms{current_ms - update_interval};
+        if (current_ms - prev_ms < update_interval) {
             return;
         }
         prev_ms = current_ms;
@@ -37,8 +38,8 @@ struct TheMainApp {
     constexpr static auto read_temperature = [](const uint32_t current_ms) {
         using components::Millis;
 
-        static auto prev_ms = current_ms + 100'000UL;
-        if (current_ms - prev_ms < 30'000UL) {
+        static uint32_t prev_ms{current_ms - update_interval};
+        if (current_ms - prev_ms < update_interval) {
             return;
         }
         prev_ms = current_ms;

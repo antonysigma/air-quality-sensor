@@ -23,7 +23,7 @@ struct Blink {
         cib::extend<MainLoop>([](const uint32_t current_ms) {
             // TODO(antony): decouple GPIO component and the application.
 
-            static auto prev_ms = Millis();
+            static uint32_t prev_ms{};
             if (current_ms - prev_ms < blink_interval) {
                 return;
             }
