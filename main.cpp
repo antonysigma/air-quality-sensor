@@ -13,6 +13,7 @@
 #include "components/seven-segment-display.hpp"
 #include "components/temperature_sensor.hpp"
 #include "components/the_main_app.hpp"
+#include "components/gpio.hpp"
 
 namespace {
 struct RegisteredInterfaces {
@@ -26,7 +27,14 @@ struct RegisteredInterfaces {
 using namespace components;
 
 // clang-format off
-using Heartbeat = Blink<13>;
+using LedPin = Pin<'B', 5>;
+using Timer1Pin = Pin<'B', 2>;
+using Timer2Pin = Pin<'D', 3>;
+
+static_assert(unique_pins<LedPin, Timer1Pin, Timer2Pin>);
+
+using LED = GPIO<LedPin>;
+using Heartbeat = Blink<LED>;
 using SerialPort = serial_port::Impl;
 using I2CPort = i2c_port::Impl;
 using TS = TemperatureSensor<Heartbeat, I2CPort>;

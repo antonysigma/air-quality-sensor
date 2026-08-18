@@ -5,8 +5,7 @@
 
 namespace components {
 
-// TODO(antony): define a struct io_def_t instead of uint8_t.
-template <uint8_t led_id>
+template <typename LED>
 struct Blink {
     enum blink_interval_t : uint16_t {  // NOLINT(performance-enum-size)
         FAST = 200,
@@ -16,7 +15,7 @@ struct Blink {
 
     static void setMode(const blink_interval_t m) { blink_interval = m; }
 
-    constexpr static auto init_led = flow::action<"init_led">([]() { pinMode(led_id, OUTPUT); });
+    constexpr static auto init_led = flow::action<"init_led">([]() { LED::init(); });
 
     constexpr static auto config = cib::config(
         cib::extend<RuntimeInit>(core::disable_interrupt >> *init_led >> core::enable_interrupt),
@@ -31,8 +30,8 @@ struct Blink {
             }
             prev_ms = current_ms;
 
-            static uint8_t state = LOW;
-            digitalWrite(led_id, state);
+            static bool state = false;
+            LED::digitalWrite(state);
             state = !state;
         }));
 };
