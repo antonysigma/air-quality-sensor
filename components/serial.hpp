@@ -9,10 +9,9 @@ namespace components {
 namespace serial_port {
 
 namespace internal {
-template <units::KiloHertz rate>
-constexpr uint16_t
-baudrateRegisterValue() {
-    return static_cast<uint16_t>(system_freq / rate + 1) / 2 - 1;
+consteval uint16_t
+baudrateRegisterValue(units::KiloHertz rate) {
+    return static_cast<uint16_t>(system_freq / rate / 8) - 1;
 }
 
 struct UcsrARegister {
@@ -29,42 +28,38 @@ struct UcsrARegister {
     uint8_t rxc : 1 = 0;
 };
 
-union UcsrBRegister {
-    uint8_t buffer{};
+struct UcsrBRegister {
+    uint8_t txb8 : 1 = 0;
+    uint8_t rxb8 : 1 = 0;
+    uint8_t ucsz2 : 1 = 0;
 
-    struct {
-        uint8_t txb8 : 1 = 0;
-        uint8_t rxb8 : 1 = 0;
-        uint8_t ucsz2 : 1 = 0;
+    /** Transmission enable */
+    uint8_t txen : 1 = 0;
 
-        /** Transmission enable */
-        uint8_t txen : 1 = 0;
+    /** Receive enable */
+    uint8_t rxen : 1 = 0;
 
-        /** Receive enable */
-        uint8_t rxen : 1 = 0;
+    /** Data register empty interrupt request */
+    uint8_t udrie : 1 = 0;
 
-        /** Data register empty interrupt request */
-        uint8_t udrie : 1 = 0;
+    /** Transmission completion interrupt request */
+    uint8_t txcie : 1 = 0;
 
-        /** Transmission completion interrupt request */
-        uint8_t txcie : 1 = 0;
+    /** Receive completion interrupt request */
+    uint8_t rxcie : 1 = 0;
 
-        /** Receive completion interrupt request */
-        uint8_t rxcie : 1 = 0;
-    } fields;
+    constexpr operator uint8_t() const { return stdx::v1::bit_cast<uint8_t>(*this); }
 };
 static_assert(sizeof(UcsrBRegister) == 1);
 
-union UcsrCRegister {
-    uint8_t buffer{};
+struct UcsrCRegister {
+    uint8_t ucpol : 1 = 0;
+    uint8_t ucsz : 2 = 0;
+    uint8_t usbs : 1 = 0;
+    uint8_t upm : 2 = 0;
+    uint8_t umsel : 2 = 0;
 
-    struct {
-        uint8_t ucpol : 1 = 0;
-        uint8_t ucsz : 2 = 0;
-        uint8_t usbs : 1 = 0;
-        uint8_t upm : 2 = 0;
-        uint8_t umsel : 2 = 0;
-    } fields;
+    constexpr operator uint8_t() const { return stdx::v1::bit_cast<uint8_t>(*this); }
 };
 static_assert(sizeof(UcsrCRegister) == 1);
 
@@ -79,25 +74,31 @@ struct Impl {
     constexpr static auto setup_serial = flow::action<"setup_serial">([]() {
         using serial_port::internal::UcsrBRegister;
         using serial_port::internal::UcsrCRegister;
-        // auto& ucsrc{*reinterpret_cast<volatile uint8_t*>(0xC2)};
-        // ucsrc = UcsrCRegister{.fields={.ucpol=1, .ucsz=0b11, .usbs=1, .upm=0b00,
-        // .umsel=0b01}}.buffer;
+        using units::literals::operator""_kHz;
 
-        // auto& ucsrb{*reinterpret_cast<volatile uint8_t*>(0xC1)};
-        // ucsrb = UcsrBRegister{.fields={.txen=1,.rxen=1}}.buffer;
-
-        // UCSR0C = (USART_UMSEL0 << UMSEL00 ) | (USART_UPM0 << UPM00) | (USART_USBS0 << USBS0) |
-        //		((USART_UCSZ0 & 3) << UCSZ00 ) | (USART_UCPOL0 << UCPOL0);
-
-        // UCSR0B = (USART_RXEN << RXEN0) | (USART_TXEN << TXEN0) | (USART_UCSZ0 & 0x4) |
-        //		(USART_RXC << RXCIE0) | (USART_TXC << TXCIE0) | (USART_UDRE << UDRIE0);
-
-        using namespace units::literals;
         constexpr auto baudrate = 115.200_kHz;
-        Serial.begin(baudrate / 1e-3_kHz);
+        // Async, double-speed
+        ucsra.u2x = 1;
 
-        // auto& ubrr{*reinterpret_cast<volatile uint16_t*>(0xC5)};
-        // ubrr = serial_port::baudrateRegisterValue<baudrate>();
+        // 8-N-1, hardware asychronous
+        auto& ucsrc{*reinterpret_cast<volatile uint8_t*>(0xC2)};
+        ucsrc = UcsrCRegister{
+            .ucpol = 0,
+            .ucsz = 0b11,
+            .usbs = 0,
+            .upm = 0b00,
+            .umsel = 0b00,
+        };
+
+        // Enable bi-directional serial
+        auto& ucsrb{*reinterpret_cast<volatile uint8_t*>(0xC1)};
+        ucsrb = UcsrBRegister{
+            .txen = 1,
+            .rxen = 1,
+        };
+
+        auto& ubrr{*reinterpret_cast<volatile uint16_t*>(0xC4)};
+        ubrr = internal::baudrateRegisterValue(baudrate);
     });
 
     static void wait() {
