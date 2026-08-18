@@ -11,7 +11,15 @@ struct TheMainApp {
     static constexpr auto update_interval{30'000_ms};
 
     constexpr static auto read_air_quality = [](const data_models::TimeMs current_ms) {
-        static units::Millisecond<uint16_t> prev_ms{current_ms - update_interval};
+        static units::Millisecond<uint16_t> prev_ms{};
+
+        // Eliminate the 32-bit guard variable for non-zero static initialization.
+        static bool is_first_time{true};
+        if (is_first_time) {
+            prev_ms = current_ms - update_interval;
+            is_first_time = false;
+        }
+
         if (current_ms - prev_ms < update_interval) {
             return;
         }
@@ -37,7 +45,15 @@ struct TheMainApp {
     };
 
     constexpr static auto read_temperature = [](const data_models::TimeMs current_ms) {
-        static units::Millisecond<uint16_t> prev_ms{current_ms - update_interval};
+        static units::Millisecond<uint16_t> prev_ms{};
+
+        // Eliminate the 32-bit guard variable for non-zero static initialization.
+        static bool is_first_time{true};
+        if (is_first_time) {
+            prev_ms = current_ms - update_interval;
+            is_first_time = false;
+        }
+
         if (current_ms - prev_ms < update_interval) {
             return;
         }
