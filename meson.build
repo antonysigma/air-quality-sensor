@@ -57,6 +57,19 @@ main_exe = executable('main',
     ],
 )
 
+avrsize_json = custom_target('avrsize.json',
+    input: main_exe,
+    output: 'avrsize.json',
+    command: [
+        python_exe,
+        elf2esbuild_py,
+        '-o', '@OUTPUT@',
+        '--hierarchy=cpp',
+        '@INPUT@',
+    ],
+    build_by_default: true,
+)
+
 main_hex = custom_target('main.hex',
     input: main_exe,
     output: 'main.hex',
