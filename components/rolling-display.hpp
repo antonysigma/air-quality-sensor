@@ -12,21 +12,23 @@ namespace components {
 
 namespace rolling_display {
 
+using data_models::TimeMs;
+
 namespace internal {
+
 template <class Display>
 struct StateMachine {
-    uint32_t prev_ms{};
+    TimeMs prev_ms{};
 
     auto operator()() {
-        using data_models::TimeMs;
         // Guards
         auto after_one_second = [&](const TimeMs current_ms) -> bool {
-            constexpr auto update_interval_ms = 1000;
-            return current_ms.value - prev_ms >= update_interval_ms;
+            using units::literals::operator""_ms;
+            return current_ms - prev_ms >= 1000_ms;
         };
 
         // Actions
-        auto update_time = [&](const TimeMs current_ms) { prev_ms = current_ms.value; };
+        auto update_time = [&](const TimeMs current_ms) { prev_ms = current_ms; };
 
         // Actions
         constexpr auto print_tvoc_banner = []() {
@@ -80,7 +82,7 @@ struct StateMachine {
     }
 };
 
-using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::fold_expr>;
+using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::branch_stm>;
 }  // namespace internal
 
 template <class Display>
@@ -96,9 +98,8 @@ struct Impl {
     static constexpr void update(const data_models::EnvironmentData e) { env = e; }
 
     constexpr static auto config = cib::config(  //
-        cib::extend<MainLoop>([](const uint32_t current_ms) {
-            state_machine.process_event(data_models::TimeMs{current_ms});
-        }));
+        cib::extend<MainLoop>(
+            [](const TimeMs current_ms) { state_machine.process_event(current_ms); }));
 };
 }  // namespace rolling_display
 

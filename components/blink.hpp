@@ -20,11 +20,13 @@ struct Blink {
 
     constexpr static auto config = cib::config(
         cib::extend<RuntimeInit>(core::disable_interrupt >> *init_led >> core::enable_interrupt),
-        cib::extend<MainLoop>([](const uint32_t current_ms) {
+        cib::extend<MainLoop>([](const units::Millisecond<uint16_t> current_ms) {
+            using units::literals::operator""_ms;
+
             // TODO(antony): decouple GPIO component and the application.
 
-            static uint32_t prev_ms{};
-            if (current_ms - prev_ms < blink_interval) {
+            static units::Millisecond<uint16_t> prev_ms{};
+            if (current_ms - prev_ms < blink_interval * 1_ms) {
                 return;
             }
             prev_ms = current_ms;

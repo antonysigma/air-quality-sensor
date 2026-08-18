@@ -1,16 +1,17 @@
 #pragma once
 #include "core.hpp"
+#include "data-models/timing.hpp"
 #include "utils/pgm_string.hpp"
 
 namespace controllers {
 
+using units::literals::operator""_ms;
 template <class TemperatureSensor, class GasSensor, class Display, class SerialPort>
 struct TheMainApp {
-    static constexpr auto update_interval{30'000UL};
-    constexpr static auto read_air_quality = [](const uint32_t current_ms) {
-        using components::Millis;
+    static constexpr auto update_interval{30'000_ms};
 
-        static uint32_t prev_ms{current_ms - update_interval};
+    constexpr static auto read_air_quality = [](const data_models::TimeMs current_ms) {
+        static units::Millisecond<uint16_t> prev_ms{current_ms - update_interval};
         if (current_ms - prev_ms < update_interval) {
             return;
         }
@@ -35,10 +36,8 @@ struct TheMainApp {
         print(measurements);
     };
 
-    constexpr static auto read_temperature = [](const uint32_t current_ms) {
-        using components::Millis;
-
-        static uint32_t prev_ms{current_ms - update_interval};
+    constexpr static auto read_temperature = [](const data_models::TimeMs current_ms) {
+        static units::Millisecond<uint16_t> prev_ms{current_ms - update_interval};
         if (current_ms - prev_ms < update_interval) {
             return;
         }

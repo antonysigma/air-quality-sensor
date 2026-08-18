@@ -1,5 +1,6 @@
 #pragma once
 
+#include <util/atomic.h>
 #include <wiring_private.h>
 
 #include "callbacks.hpp"
@@ -8,13 +9,21 @@
 
 namespace components {
 
-static volatile uint32_t
-    millis_value =  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-    0;
-uint32_t
-Millis() {  // NOLINT(readability-identifier-naming)
-    return millis_value;
-}
+struct WallClock {
+    static inline volatile uint16_t value{
+        0};  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+    static units::Millisecond<uint16_t> now() {  // NOLINT(readability-identifier-naming)
+        uint16_t safe_copy;
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { safe_copy = value; }
+        return {safe_copy};
+    }
+
+    static void sleepFor(
+        const units::Millisecond<uint16_t> duration) {  // NOLINT(readability-identifier-naming)
+        for (const auto prev_time = now(); now() - prev_time < duration;) {
+        }
+    }
+};
 
 namespace core {
 
@@ -36,19 +45,20 @@ prescalerRegisterValue() {
     }
 }
 
-template <uint16_t prescaler_value, units::Microsecond<uint32_t> time_interval>
-consteval uint8_t
-overflowRegisterValue() {
-    static_assert(static_cast<uint64_t>(timer0.freq * time_interval) % prescaler_value == 0,
-                  "Timer0 period must be a multiple of prescaler");
+template <uint16_t prescaler_value, units::Microsecond<uint32_t> time_interval,
+          typename T = uint8_t>
+consteval T
+topRegisterValue() {
+    static_assert(static_cast<uint64_t>(system_freq * time_interval) % prescaler_value == 0,
+                  "Period must be a multiple of prescaler");
 
     constexpr auto overflow_value =
-        static_cast<uint32_t>(timer0.freq * time_interval / prescaler_value - 1);
-    static_assert(overflow_value < 255,
-                  "Overflow register value > 255; insufficient clock prescaler value?");
-    return static_cast<uint8_t>(overflow_value);
+        static_cast<uint32_t>(system_freq * time_interval / prescaler_value - 1);
+    static_assert(overflow_value <= std::numeric_limits<T>::max(),
+                  "Top register value overflowed; insufficient clock prescaler value?");
+    return static_cast<T>(overflow_value);
 }
-static_assert(overflowRegisterValue<64, 1_ms>() == 0xF9);
+static_assert(topRegisterValue<64, 1'000_us>() == 0xF9);
 
 template <units::KiloHertz timer_freq>
 consteval uint8_t
@@ -74,16 +84,11 @@ constexpr static auto system_clk_init = flow::action<"system_clk_init">([]() {
     CLKPR = clockPrescaler<system_freq>();
 });
 
-static constexpr auto dsu_init = flow::action<"dsu_init">([]() {
-    volatile uint8_t& dcsr{*reinterpret_cast<volatile uint8_t*>(0x20)};
-    dcsr = dcsr | (1 << 7);
-});
-
 static constexpr auto timer0_init = flow::action<"timer0_init">([]() {
     constexpr auto prescaler = 64UL;
 
     TCCR0A = TCCR0A | (1u << WGM01);                                        // Set the CTC mode
-    OCR0A = overflowRegisterValue<prescaler, timer0.interrupt_interval>();  // Set the value for 1ms
+    OCR0A = topRegisterValue<prescaler, timer0.interrupt_interval>();       // Set the value for 1ms
     TIMSK0 = TIMSK0 | (1u << OCIE0A);  // Set the interrupt request
 
     TCCR0B = TCCR0B | prescalerRegisterValue<prescaler>();  // Set the prescale 1/64 clock
@@ -93,9 +98,9 @@ struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
             *disable_interrupt >> *system_clk_init >> *timer0_init >> *enable_interrupt,  //
-            disable_interrupt >> *dsu_init >> enable_interrupt                         //
+            disable_interrupt >> enable_interrupt                                         //
             ),
-        cib::extend<OnTimer0Interrupt>([]() { millis_value = millis_value + 1; })  //
+        cib::extend<OnTimer0Interrupt>([]() { WallClock::value = WallClock::value + 1; })  //
     );
 };
 

@@ -1,8 +1,9 @@
 #pragma once
 #include <cstdint>
 
+#include "utils/units.hpp"
+
 namespace data_models {
-struct TimeMs {
-    uint32_t value{};
-};
+
+using TimeMs = units::Millisecond<uint16_t>;
 }  // namespace data_models

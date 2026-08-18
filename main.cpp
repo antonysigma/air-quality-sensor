@@ -61,8 +61,7 @@ main() {
     nexus.service<RuntimeInit>();
 
     for (;;) {
-        const auto current_ms = components::Millis();
-        nexus.service<MainLoop>(current_ms);
+        nexus.service<MainLoop>(WallClock::now());
     }
 
     return 0;
