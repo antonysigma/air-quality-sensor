@@ -94,10 +94,16 @@ static constexpr auto timer0_init = flow::action<"timer0_init">([]() {
     TCCR0B = TCCR0B | prescalerRegisterValue<prescaler>();  // Set the prescale 1/64 clock
 });
 
+static constexpr auto dsu_init = flow::action<"dsu_init">([]() {
+    volatile uint8_t& dcsr{*reinterpret_cast<volatile uint8_t*>(0x20)};
+    dcsr = dcsr | (1 << 7);
+});
+
 struct Impl {
     constexpr static auto config = cib::config(  //
         cib::extend<RuntimeInit>(
             *disable_interrupt >> *system_clk_init >> *timer0_init >> *enable_interrupt,  //
+            disable_interrupt >> *dsu_init >> enable_interrupt,                           //
             disable_interrupt >> enable_interrupt                                         //
             ),
         cib::extend<OnTimer0Interrupt>([]() { WallClock::value = WallClock::value + 1; })  //

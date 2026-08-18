@@ -8,6 +8,8 @@
 
 namespace components {
 
+using units::literals::operator""_ms;
+
 template <class Indicator, class I2CPort, uint8_t i2c_addr = 0x38>
 struct TemperatureSensor {
     static inline bool has_sensor{false};
@@ -17,7 +19,7 @@ struct TemperatureSensor {
 
         I2CPort::send(i2c_addr, ahtx0::TriggerCmd{});
         while (I2CPort::template read<ahtx0::Status>(i2c_addr).isBusy()) {
-            delay(10);
+            WallClock::sleepFor(10_ms);
         }
 
         const auto measurements = I2CPort::template read<ahtx0::Measurements>(i2c_addr);
@@ -27,7 +29,7 @@ struct TemperatureSensor {
     constexpr static void wait() {
         using commands::ahtx0::Status;
         while (I2CPort::template read<Status>(i2c_addr).isBusy()) {
-            delay(10);
+            WallClock::sleepFor(10_ms);
         }
     }
 
@@ -35,10 +37,10 @@ struct TemperatureSensor {
         flow::action<"ping_temperature_sensor">([]() {
             namespace ahtx0 = commands::ahtx0;
             // Wait for device to power up.
-            delay(20);
+            WallClock::sleepFor(20_ms);
 
             I2CPort::send(i2c_addr, ahtx0::SoftResetCmd{});
-            delay(20);
+            WallClock::sleepFor(20_ms);
             wait();
 
             I2CPort::send(i2c_addr, ahtx0::CalibrateCmd{});
