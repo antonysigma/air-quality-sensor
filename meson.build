@@ -2,6 +2,7 @@ project('air-quality-sensor', 'cpp',
     default_options: [
         'cpp_std=c++20'
     ],
+    meson_version: '>=1.6.0',
 )
 
 assert(meson.is_cross_build(), 'Must be a cross-compile environment.')
@@ -15,7 +16,7 @@ cib_dep = cib_proj.get_variable('cib_dep')
 arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')
 
-avr_objcopy_exe = find_program(meson.get_cross_property('avr_toolchain_bin_path') / 'avr-objcopy')
+avr_objcopy_exe = find_program(meson.get_external_property('avr_toolchain_bin_path') / 'avr-objcopy')
 avrdude_exe = cib_proj.get_variable('avrdude_exe')
 avrdude_conf = cib_proj.get_variable('avrdude_conf')
 
