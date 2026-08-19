@@ -6,6 +6,8 @@ bare-metal microcontrollers (MCUs) with zero runtime overhead. It also shows how
 modern build systems like [Meson](https://mesonbuild.com) enables both model-in-the-loop testing, enabling
 rapid design iterations.
 
+<img width="1024" height="645" alt="pcb-preview" src="https://github.com/user-attachments/assets/55c840f8-086a-4c87-b07b-3c4ecabb8e95" />
+
 ## Architecture diagrams
 
 ### Runtime initialization dependency graph
