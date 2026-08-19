@@ -1,5 +1,8 @@
 build-uno/
 subprojects/*/
+subprojects/packagecache
+subprojects/*.wrap
+subprojects/.wraplock
 
 # Python virtual environment
 .venv/

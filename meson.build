@@ -7,11 +7,11 @@ project('air-quality-sensor', 'cpp',
 
 assert(meson.is_cross_build(), 'Must be a cross-compile environment.')
 
-boost_sml_inc = subproject('boost-sml').get_variable('boost_sml_inc')
-avr_stdcpp_dep = subproject('avr-libstdcpp').get_variable('avr_stdcpp_dep')
-
 cib_proj = subproject('compile-time-init-build')
 cib_dep = cib_proj.get_variable('cib_dep')
+
+boost_sml_inc = subproject('boost-sml').get_variable('boost_sml_inc')
+avr_stdcpp_dep = subproject('avr-libstdcpp').get_variable('avr_stdcpp_dep')
 
 arduinocore_proj = subproject('arduinocore-avr')
 common_inc = include_directories('.')

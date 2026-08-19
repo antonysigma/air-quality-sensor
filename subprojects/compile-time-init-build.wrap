@@ -1,5 +1,5 @@
-[wrap-git]
-directory = compile-time-init-build
-url = https://github.com/intel/compile-time-init-build.git
-revision = mesonbuild-no-fmtlib
-depth = 1
+[wrap-file]
+directory = compile-time-init-build-logging-writer
+source_url = https://github.com/antonysigma/compile-time-init-build/archive/refs/heads/logging-writer.tar.gz
+source_filename = compile-time-init-build-logging-writer.tar.gz
+source_hash = c67dc58b2c777f751a02d859bdf66faa2fce677c1487b0b13bdad89e64323674
